@@ -1,0 +1,1316 @@
+@font-face {
+  font-family: "Oregon-LDO-ExtraBlack";
+  src: url('../fonts/Oregon LDO ExtraBlack.ttf') format('truetype');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Oregon-LDO";
+  src: url('../fonts/Oregon LDO.ttf') format('truetype');
+}
+
+* {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-family: "Oregon-LDO", sans-serif;
+  color: #423c2b;
+}
+
+html {
+  padding-bottom: 100px;
+}
+
+div.loading {
+  display: none;
+
+  background-color: #fdeec5;
+  opacity: .6;
+  filter: alpha(opacity=60);
+  z-index: 3;
+
+  background-image: url(../img/loading.gif);
+  background-repeat: no-repeat;
+  background-size: 200px;
+  background-position: center;
+
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+/* HEADER */
+
+header {
+  background-color: #111;
+  background-image: url('../img/header.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  min-width: 400px;
+  position: fixed;
+  top: 0;
+  z-index: 1;
+  text-align: center;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
+  height: 60px;
+}
+
+header img {
+  margin-top: 10px;
+  height: 40px;
+}
+
+header.black {
+  background-image: none;
+  background: #211707;
+  background: linear-gradient(#4b3921, #000000);
+}
+
+/* HEADER */
+
+/* MAIN */
+
+main::after {
+  content: '';
+  display: block;
+  height: 0;
+  clear: both;
+}
+
+div::after {
+  content: '';
+  display: block;
+  height: 0;
+  clear: both;
+}
+
+main.texto {
+  display: block;
+  width: 800px;
+  max-width: 95%;
+  min-width: 380px;
+  box-sizing: border-box;
+
+  background-image: linear-gradient(#dad798, #dacb8f);
+  margin: 80px auto 10px auto;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 15px;
+
+  box-shadow:
+    inset #4b3921 0 0 0 4px,
+    inset #dad798 0 0 0 6px;
+}
+
+main.texto > div.em-construcao {
+  display: block;
+  float: left;
+  box-sizing: border-box;
+  padding: 5px;
+  background-color: rgba(191, 54, 12, 0.5);
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+main.texto > span,
+main.texto > div.atributos > span {
+  display: block;
+  float: left;
+
+  font-size: 1.2em;
+  font-weight: bold;
+  line-height: 29px;
+}
+
+main.texto > div.atributos {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 3px;
+}
+
+main.texto > div.bloco-texto {
+  display: block;
+  float: left;
+  box-sizing: border-box;
+  padding: 5px;
+  background-color: rgba(191, 54, 12, 0.1);
+  margin-bottom: 10px;
+}
+
+main.texto > div.bloco-texto-apoio {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+main.texto > div.bloco-texto-apoio > span.asterisco {
+  padding: 0 3px;
+  background-color: rgba(59, 39, 11, .3);
+  font-weight: bold;
+}
+
+main.texto > br {
+  clear: both;
+}
+
+main.texto > a {
+  color: #bf360c;
+}
+
+main.texto > div.bloco {
+  display: block;
+  float: left;
+  margin-top: 10px;
+  min-height: 26px;
+}
+
+main.texto > div.bloco-campos {
+  width: 100%;
+}
+
+main.texto > div.invisivel {
+  display: none;
+}
+
+main.texto > div.bloco-botoes {
+  width: 100%;
+  margin-top: 20px;
+}
+
+main.texto > div.bloco-checkbox {
+  width: 100%;
+  background-color: rgba(59, 39, 11, .3);
+}
+
+main.texto > div.bloco-atributos {
+  margin-top: 0;
+
+  box-sizing: border-box;
+  width: 33.33%; /* as @passatgt mentioned in the comment, for the older browsers fallback */
+  width: calc(100% / 3);
+  padding-left: 1%;
+}
+
+main.texto > div.primeiro {
+  padding-left: 0;
+}
+
+main.texto > div.quarto {
+  padding-left: 0;
+}
+
+main.texto > div.segunda-linha {
+  margin-top: 5px;
+}
+
+/* MAIN */
+
+/* CAMPOS */
+
+main.texto > div.bloco-campos > span.dica {
+  display: block;
+  float: left;
+  width: 55%;
+  box-sizing: border-box;
+  padding-left: 4px;
+  line-height: 26px;
+  font-weight: bold;
+  font-size: 0.8em;
+}
+
+main.texto > div.bloco-campos > label {
+  display: block;
+  float: left;
+  width: 20%;
+  box-sizing: border-box;
+  padding-left: 4px;
+  line-height: 26px;
+  font-weight: bold;
+  background-color: rgba(59, 39, 11, .3);
+}
+
+main.texto > div.bloco-campos > label.coluna-interna {
+  margin-left: 4%;
+}
+
+main.texto > div.bloco-campos > label.magia {
+  width: 30%;
+}
+
+main.texto > div.bloco-campos > label.disciplina {
+  font-size: 0.9em;
+}
+
+main.texto > div.bloco-checkbox > label {
+  background-color: rgba(0, 0, 0, 0);
+  width: 90%;
+}
+
+main.texto > div.bloco-atributos > label {
+  display: block;
+  float: left;
+  width: 70%;
+  box-sizing: border-box;
+  padding-left: 4px;
+  line-height: 26px;
+  font-weight: bold;
+  background-color: rgba(59, 39, 11, .3);
+}
+
+main.texto > div.bloco-atributos > label.menor {
+  font-size: 0.9em;
+}
+
+main.texto > div.bloco-campos label.menor {
+  font-size: 0.9em;
+}
+
+main.texto > div.bloco-campos > input[type=checkbox] {
+  display: block;
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin: 6px 2px 0 5px;
+}
+
+main.texto > div.bloco-campos > input[type=text],
+main.texto > div.bloco-campos > input[type=number] {
+  display: block;
+  float: left;
+  width: 80%;
+  line-height: 26px;
+  text-indent: 3px;
+
+  font-family: "Oregon-LDO", sans-serif;
+  color: #423c2b;
+}
+
+main.texto > div.bloco-campos > select {
+  display: block;
+  float: left;
+  width: 80%;
+  height: 26px;
+  text-indent: 3px;
+}
+
+main.texto > div.bloco-campos > select.magia {
+  width: 70%;
+}
+
+main.texto > div.bloco-campos > select > option {
+  font-size: 1em;
+  font-family: "Oregon-LDO", sans-serif;
+  color: #423c2b;
+}
+
+main.texto > div.bloco-campos > input[type=number] {
+  text-indent: 0;
+  text-align: center;
+}
+
+main.texto > div.bloco-campos > input[type=number].pequeno {
+  width: 20%;
+}
+
+main.texto > div.bloco-campos > input[type=number].medio {
+  width: 28%;
+}
+
+main.texto > div.bloco-campos > select.medio {
+  width: 28%;
+}
+
+main.texto > div.bloco-atributos > input[type=number] {
+  display: block;
+  float: left;
+  width: 30%;
+  line-height: 26px;
+  text-align: center;
+  font-family: "Oregon-LDO", sans-serif;
+  color: #423c2b;
+}
+
+/*
+#ficha-npcs > textarea {
+  padding: 4px;
+  resize: none;
+  width: 99%;
+}
+*/
+
+/* CAMPOS */
+
+/* BOTOES GERAIS */
+
+button {
+  display: block;
+  padding: 4px 8px;
+  background-color: #bf360c;
+  font-weight: bold;
+  box-sizing: border-box;
+  height: 28px;
+}
+
+button.fab {
+  display: none;
+  position: fixed;
+  right: 40px;
+  bottom: 30px;
+
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  border: none;
+  outline: none;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  z-index: 2;
+}
+
+button:hover {
+  background-color: #af2600;
+}
+
+button::after {
+  content: '';
+  display: block;
+  clear: both;
+  height: 0;
+}
+
+button > span {
+  display: block;
+  float: left;
+  color: #ffffff;
+  font-size: 1.2em;
+}
+
+button > img {
+  position: relative;
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  margin-right: 6px;
+}
+
+button.fab > img {
+  position: relative;
+  display: block;
+  float: none;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+}
+
+/* BOTOES GERAIS */
+
+/* BOTOES */
+
+header > button {
+  display: block;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+}
+
+header > button > img {
+  margin: 0 0 0 1px;
+}
+
+main.texto > div.bloco-botoes > button {
+  display: block;
+  float: right;
+  margin-left: 5px;
+  border-radius: 2px;
+}
+
+main.texto > div.atributos > button {
+  float: left;
+  margin-right: 5px;
+  border-radius: 2px;
+}
+
+main.texto > button.mostrar {
+  display: block;
+  float: left;
+
+  margin-right: 5px;
+  border-radius: 2px;
+}
+
+#ficha-itens-loot > button,
+#ficha-itens-armeiro > button,
+#ficha-itens-taverna > button,
+#ficha-itens-alfaiataria > button {
+  float: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border-radius: 2px;
+}
+
+#ficha-itens-loot > button > img,
+#ficha-itens-armeiro > button > img,
+#ficha-itens-taverna > button > img,
+#ficha-itens-alfaiataria > button > img,
+#texto-botao-copiar-npcs > button > img {
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
+}
+
+#ficha-itens-loot > div.texto-itens,
+#ficha-itens-armeiro > div.texto-itens,
+#ficha-itens-taverna > div.texto-itens,
+#ficha-itens-alfaiataria > div.texto-itens {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* BOTOES */
+
+/* MENUS */
+
+main.menu {
+  margin-top: 10px;
+  text-align: center;
+  z-index: 1;
+}
+
+main.menu > a.menu {
+  display: inline-block;
+  height: 170px;
+  width: 170px;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0px 0px 30px rgb(0 0 0 / 10%);
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 170px;
+  text-decoration: none;
+
+  margin: 10px;
+}
+
+main.menu > a.menu-personagens {
+  background-image: url(../img/menu_personagens.jpg);
+}
+
+main.menu > a.menu-npcs {
+  background-image: url(../img/menu_npcs.jpg);
+}
+
+main.menu > a.menu-itens {
+  background-image: url(../img/menu_itens.jpg);
+}
+
+main.menu > a.menu-grimorio {
+  background-image: url(../img/menu_grimorio.jpg);
+}
+
+main.menu > a.menu > span {
+  display: inline-block;
+  font-family: "Oregon-LDO-ExtraBlack";
+  color: #fff;
+  -webkit-text-stroke: 1px #423c2b;
+  font-size: 1.8em;
+  text-shadow: 0 0 10px rgba(0, 0, 0);
+  line-height: 30px;
+  margin-top: 50px;
+}
+
+/* MENUS */
+
+/* Configurações por IDs */
+
+#header-botao-voltar {
+  display: none;
+}
+
+#texto-botao-voltar {
+  float: left;
+  margin-left: 0;
+}
+
+#texto-botao-voltar-itens {
+  float: left;
+  margin-left: 0;
+}
+
+#texto-botao-voltar-npcs {
+  float: left;
+  margin-left: 0;
+}
+
+#texto-botao-voltar-grimorio {
+  float: left;
+  margin-left: 0;
+}
+
+#pagina-personagens {
+  display: none;
+}
+
+#pagina-calendario {
+  display: none;
+}
+
+#pagina-grimorio {
+  display: none;
+}
+
+#pagina-itens {
+  display: none;
+}
+
+#pagina-npcs {
+  display: none;
+}
+
+#texto-botao-mostrar1 {
+  display: block;
+}
+
+#texto-botao-esconder1 {
+  display: none;
+}
+
+#texto-bloco1 {
+  display: none;
+}
+
+#texto-botao-mostrar2 {
+  display: block;
+}
+
+#texto-botao-esconder2 {
+  display: none;
+}
+
+#texto-bloco2 {
+  display: none;
+}
+
+/* Inventário */
+
+.shimmer-effect {
+  color: grey;
+  display: inline-block;
+  mask: linear-gradient(-60deg, #000 30%, #0005, #000 70%) right/350% 100%;
+  animation: shimmer 1.5s infinite;
+  animation-delay: 0;
+  font-size: 50px;
+  max-width: 200px;
+}
+
+@keyframes shimmer {
+  100% {
+    mask-position: left
+  }
+}
+
+div.inventario > div.shimmer {
+  display: block;
+  width: 800px;
+  max-width: 95%;
+  min-width: 380px;
+  box-sizing: border-box;
+
+  background-color: #dddddd;
+  margin: 5px auto 10px auto;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+}
+
+div.inventario > div.shimmer-maior {
+  height: 120px;
+}
+
+div.inventario > div.shimmer-menor {
+  height: 40px;
+}
+
+div.inventario > div.titulo {
+  display: block;
+  width: 800px;
+  max-width: 95%;
+  min-width: 380px;
+  box-sizing: border-box;
+
+  background-image: linear-gradient(#4b3921, #000000) !important;
+  margin: 10px auto 0 auto;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 5px 0 5px 15px;
+}
+
+div.inventario > div.titulo-editar {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+div.inventario > div.titulo > h2 {
+  display: block;
+  float: left;
+  font-size: 1.5em;
+  color: #ffffff;
+}
+
+div.inventario > div.titulo > button {
+  display: block;
+  float: right;
+  margin-right: 15px;
+  margin-top: 0.5px;
+  font-size: 1em;
+  color: #ffffff;
+  background-color: #7b6951;
+  box-shadow: 1px 1px 2px #ffffff;
+  border-radius: 4px;
+}
+
+div.inventario > div.titulo > button:hover {
+  background-color: #5b4931;
+}
+
+div.inventario > div.titulo > button > span {
+  display: block;
+  float: right;
+  margin: 0 3px 0 2px;
+  font-size: 1em;
+  color: #ffffff;
+}
+
+div.inventario > div.titulo > button > img {
+  display: block;
+  float: left;
+  margin: 0 5px 0 0;
+  height: 20px;
+  width: 20px;
+}
+
+div.inventario > div.linhas {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 100%;
+}
+
+div.inventario div.erro {
+  display: none;
+  width: 800px;
+  height: 863px;
+  max-width: 95%;
+  min-width: 380px;
+  box-sizing: border-box;
+
+  background-image: url(../img/erro.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 0 -240px;
+
+  margin: 5px auto 5px auto;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 0 15px 5px 15px;
+
+  border: 2px solid #000000; /* rgba(59, 39, 11, .3); */
+}
+
+div.inventario div.erro > label {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  text-align: center;
+  margin: 30px auto 0 auto;
+  line-height: 30px;
+  font-weight: bold;
+  background-color: rgba(255, 0, 0, .2);
+  font-size: 1.3em;
+  color: #af2600;
+}
+
+div.inventario div.linha {
+  display: block;
+  width: 800px;
+  max-width: 95%;
+  min-width: 380px;
+  box-sizing: border-box;
+
+  background-image: url(../img/background.jpg);
+  margin: 5px auto 5px auto;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 0 15px 5px 15px;
+
+  border: 2px solid #000000; /* rgba(59, 39, 11, .3); */
+}
+
+div.inventario div.linha-link:hover {
+  background-image: linear-gradient(#fdfce1, #ebeacd);
+}
+
+div.inventario div.linha-editar {
+  margin: 0 auto 5px auto;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+div.inventario div.linha div.bloco {
+  width: 100%;
+  display: block;
+  float: left;
+  margin-top: 5px;
+  min-height: 26px;
+}
+
+div.inventario div.linha div.bloco > label.subtitulo {
+  display: block;
+  float: left;
+  width: 75%;
+  box-sizing: border-box;
+  padding: 0;
+  line-height: 30px;
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 1.2em;
+}
+
+div.inventario div.linha div.bloco-subtitulo {
+  margin-top: 10px;
+}
+
+div.inventario div.linha div.bloco-cor {
+  background-color: rgba(59, 39, 11, .1);
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+div.inventario div.linha div.bloco-link {
+  margin-top: 0;
+}
+
+div.inventario div.linha div.lista {
+  width: 100%;
+  display: block;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+div.inventario div.linha div.permissao {
+  width: 100%;
+  display: block;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+div.inventario div.linha div.bloco > label {
+  display: block;
+  float: left;
+  width: 20%;
+  box-sizing: border-box;
+  padding-left: 4px;
+  line-height: 26px;
+  font-weight: bold;
+  background-color: rgba(59, 39, 11, .3);
+}
+
+div.inventario div.linha div.bloco > label.maior {
+  width: 30%;
+}
+
+div.inventario div.linha div.bloco > label.enviar {
+  width: 20%;
+}
+
+div.inventario div.linha div.bloco > label.sem-registros {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 1.1em;
+  text-align: center;
+}
+
+div.inventario div.linha div.bloco > label.link {
+  width: 100%;
+  background-color: rgba(59, 39, 11, .1);
+}
+
+div.inventario div.linha div.bloco > label.link > a {
+  text-decoration: underline;
+  color: #1565c0;
+}
+
+div.inventario div.linha div.bloco > label.moeda {
+  width: 70%;
+}
+
+div.inventario div.linha div.bloco > div.input-like {
+  display: block;
+  float: left;
+  width: 80%;
+  line-height: 22px;
+  text-indent: 3px;
+  box-sizing: border-box;
+  padding-top: 4px;
+  font-family: "Oregon-LDO", sans-serif;
+  font-size: 1.1em;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+div.inventario div.linha div.bloco > input[type=text],
+div.inventario div.linha div.bloco > input[type=number] {
+  display: block;
+  float: left;
+  width: 80%;
+  line-height: 22px;
+  text-indent: 3px;
+  box-sizing: border-box;
+  padding-top: 4px;
+
+  font-family: "Oregon-LDO", sans-serif;
+  color: #423c2b;
+
+  font-size: 1.1em;
+  background-color: rgba(59, 39, 11, .1);
+}
+
+div.inventario div.linha div.bloco > input[type=text].menor,
+div.inventario div.linha div.bloco > input[type=number].menor {
+  width: 70%;
+}
+
+div.inventario div.linha div.bloco > input[type=number].moeda {
+  width: 30%;
+  text-align: center;
+  text-indent: 0;
+}
+
+div.inventario div.linha div.bloco > input[type=number].enviar {
+  width: 20%;
+  text-align: center;
+  text-indent: 0;
+}
+
+div.inventario div.linha div.bloco > input[disabled] {
+  background-color: #cccccc;
+  color: #666666;
+}
+
+div.inventario div.linha div.bloco > select {
+  display: block;
+  float: left;
+  width: 70%;
+  height: 26px;
+  text-indent: 3px;
+  background-color: rgba(59, 39, 11, .1);
+}
+
+div.inventario div.linha div.bloco > select > option {
+  font-size: 1.1em;
+  font-family: "Oregon-LDO", sans-serif;
+  color: #423c2b;
+}
+
+div.inventario div.linha div.bloco > select.enviar {
+  width: 60%;
+  border-left: 4px solid rgba(59, 39, 11, .3);
+  box-sizing: border-box;
+}
+
+div.inventario div.linha div.menor-direita > select.enviar {
+  width: 80%;
+  border: 0;
+}
+
+div.inventario div.linha div.bloco > select.sistema {
+  width: 80%;
+}
+
+div.inventario div.linha div.menor > select.sistema {
+  width: 80% !important;
+}
+
+div.inventario div.linha div.bloco-checkbox {
+  width: 100%;
+  background-color: rgba(59, 39, 11, .3);
+}
+
+div.inventario div.linha div.bloco-checkbox > label {
+  background-color: rgba(0, 0, 0, 0);
+  width: 90%;
+}
+
+div.inventario div.linha div.bloco-checkbox > input[type=checkbox] {
+  display: block;
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin: 6px 2px 0 5px;
+}
+
+div.inventario div.linha div.bloco > button[type=button] {
+  float: right;
+}
+
+div.inventario div.linha div.bloco > button[type=button]:focus {
+  float: right;
+  background-color: #df562c;
+}
+
+div.inventario div.linha div.bloco-atencao {
+  background-color: rgba(191, 54, 12, 0.5);
+  padding: 5px;
+  box-sizing: border-box;
+  margin-top: 10px;
+}
+
+div.inventario div.linha div.bloco-atencao > label {
+  display: block;
+  float: left;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 1em;
+}
+
+div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar {
+  float: left;
+  background-color: #ff865c;
+}
+
+div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:focus,
+div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:hover {
+  float: left;
+  background-color: #ef764c;
+}
+
+/* Inventário - render */
+
+#campanhas_titulo {
+  display: none;
+}
+
+#campanhas_listar {
+  display: none;
+}
+
+#campanhas_editar {
+  display: none;
+}
+
+#campanhas_editar_form {
+  display: none;
+}
+
+#personagens_listar_titulo {
+  display: none;
+}
+
+#texto-bloco {
+  display: none;
+}
+
+#texto-botao-esconder {
+  display: none;
+}
+
+#campanhas_editar_salvar {
+  display: none;
+}
+
+#personagens_listar_inserir {
+  display: none;
+}
+
+#campanhas_editar_permissao {
+  display: none;
+}
+
+#toast-container > div {
+    opacity:1;
+}
+
+#campanhas_nova {
+  display: none;
+}
+
+#inventario-erro {
+  display: none;
+}
+
+#personagens_listar_sem_registros {
+  display: none;
+}
+
+#personagens_editar {
+  display: none;
+}
+
+#personagens_editar_form {
+  display: none;
+}
+
+#personagens_editar_permissao_mensagem {
+  display: none;
+}
+
+#personagens_editar_permissao_narrador {
+  display: none;
+}
+
+#personagens_editar_permissao_jogador {
+  display: none;
+}
+
+#personagens_editar_salvar {
+  display: none;
+}
+
+#personagens_editar_controlar_peso {
+  display: none;
+}
+
+#personagens_novo {
+  display: none;
+}
+
+#personagens_editar_enviar_moedas {
+  display: none;
+}
+
+#personagens_editar_form_enviar_moedas {
+  display: none;
+}
+
+#personagens_editar_alterar_campanhas {
+  display: none;
+}
+
+#personagens_editar_form_alterar_campanhas {
+  display: none;
+}
+
+/* Configurações por IDs */
+
+@media (min-width: 800px) {
+  header img {
+    margin-top: 3px;
+    height: 50px;
+  }
+
+  header > button > img {
+    height: 20px;
+    margin: 0 0 0 1px;
+  }
+
+  main.texto > div.bloco-campos {
+    width: 49%;
+  }
+
+  main.texto > div.bloco-atributos {
+    box-sizing: border-box;
+    width: 16.66%; /* as @passatgt mentioned in the comment, for the older browsers fallback */
+    width: calc(100% / 6);
+    padding-left: 1%;
+  }
+
+  main.texto > div.primeiro {
+    padding-left: 0;
+  }
+
+  main.texto > div.quarto {
+    padding-left: 1%;
+  }
+
+  main.texto > div.segunda-linha {
+    margin-top: 0;
+  }
+
+  main.texto > div.direita {
+    float: right;
+  }
+
+  main.texto > div.invisivel {
+    display: block;
+  }
+
+  div.inventario div.linha div.menor {
+    width: 49%;
+  }
+
+  div.inventario div.linha div.menor-direita {
+    margin-left: 2%;
+  }
+
+  div.inventario div.linha div.bloco > label {
+    width: 10%;
+  }
+
+  div.inventario div.linha div.bloco-atencao > label {
+    width: 100%;
+  }
+
+  div.inventario div.linha div.bloco > label.maior {
+    width: 30%;
+  }
+
+  div.inventario div.linha div.bloco > label.moeda {
+    width: 70%;
+  }
+
+  div.inventario div.linha div.bloco > select {
+    width: 70%;
+  }
+
+  div.inventario div.linha div.bloco > select.sistema {
+    width: 90%;
+  }
+
+  div.inventario div.linha div.bloco > div.input-like {
+    width: 90%;
+  }
+
+  div.inventario div.linha div.bloco > input[type=text],
+  div.inventario div.linha div.bloco > input[type=number] {
+    width: 90%;
+  }
+
+  div.inventario div.linha div.menor > label {
+    width: 20%;
+  }
+
+  div.inventario div.linha div.menor > div.input-like {
+    width: 80%;
+  }
+
+  div.inventario div.linha div.menor > input[type=text],
+  div.inventario div.linha div.menor > input[type=number] {
+    width: 80%;
+  }
+
+  div.inventario div.linha div.bloco > input[type=text].menor,
+  div.inventario div.linha div.bloco > input[type=number].menor {
+    width: 70%;
+  }
+
+  div.inventario div.linha div.bloco > input[type=number].moeda {
+    width: 30%;
+    text-align: center;
+    text-indent: 0;
+  }
+
+  div.inventario div.linha div.bloco-checkbox > label {
+    width: 90%;
+  }
+}
+
+@media print {
+  header {
+    display: none !important;
+  }
+  main {
+    display: none !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(5) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(6) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(7) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(9) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(10) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(11) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(12) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(13) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(14) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(15) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(16) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(17) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(18) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(19) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(20) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  div#ficha > div > table > tbody > tr:nth-child(21) > td:nth-child(2) > table > tbody > tr:nth-child(odd) {
+    background-color: rgba(240,240,240) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  button.fab {
+    display: none !important;
+  }
+}

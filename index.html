@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>Gerenciador de Inventários</title>
+		<link rel="icon" href="img/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="css/vanilla-toast.css">
+    <link rel="stylesheet" type="text/css" href="css/ficha.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <meta property="og:title" content="Gerenciador de Inventários" />
+    <meta property="og:image" content="img/inventario.jpg" />
+    <meta property="og:description" content="Gerenciador de Inventários do Flecha Mágica!"/>
+    <meta property="og:url" content="https://flechamagica.com.br/inventario/"/>
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="627" />
+    <meta property="og:type" content="website"/>
+  </head>
+  <body>
+    <div class="loading" id="loading"></div>
+
+    <header class="black">
+      <button type="button" id="header-botao-voltar">
+        <input type="hidden" value="" id="header-botao-voltar-url">
+        <img src="img/arrow-left-solid.svg">
+      </button>
+      <!-- <img src="img/logo.png" alt="Advanced Dungeon & Dragons 2ed"> -->
+    </header>
+
+    <main class="texto">
+      <h2>Gerenciador de Inventários</h2>
+      <div class="em-construcao" id="texto-formulario-versao">Versão 0.0.1</div>
+
+      <br>
+      <button type="button" class="mostrar" id="texto-botao-mostrar">
+        <img src="img/arrow-down-wide-short-solid.svg">
+        <span>Mostrar</span>
+      </button>
+      <button type="button" class="mostrar" id="texto-botao-esconder">
+        <img src="img/arrow-up-wide-short-solid.svg">
+        <span>Esconder</span>
+      </button>
+      <span>Sobre este gerador</span>
+
+      <br>
+      <div class="bloco-texto" id="texto-bloco">
+        Este é um gerenciador de inventários de itens de personagens para campanhas medievais. Crie suas campanhas, configure os jogadores e organize o inventário para facilitar o consumo e manutenção dos itens durante os jogos. Ao criar sua campanha <b>SALVE</b> os links indicados, principalmente o <b>Link do Narrador</b> - somente através dele você poderá modificar os dados de sua campanha. Caso o perca não será possível acessá-la como narrador. O <b>Link dos Jogadores</b> pode ser distribuído aos jogadores. O <b>Link de Visualização</b> é acessível por todos neste site e é útil para acompanhar as alterações dos inventários (como por exemplo em uma Stream).
+      </div>
+    </main>
+
+    <div class="inventario">
+
+      <div class="shimmer shimmer-menor shimmer-effect"></div>
+      <div class="shimmer shimmer-maior shimmer-effect"></div>
+
+      <div class="erro" id="inventario-erro">
+        <label>Sorry, o site rolou um erro crítico :(</label>
+      </div>
+
+      <!-- Campanhas Listar -->
+      <div class="titulo" id="campanhas_titulo">
+        <h2>Campanhas</h2>
+        <button id="campanhas_nova_abrir">
+          <img src="img/plus-solid.svg" />
+          <span>Inserir Campanha</span>
+        </button>
+      </div>
+
+      <div class="linha" id="campanhas_nova">
+        <div class="bloco">
+          <label>Nome</label>
+          <input type="text" value="" id="campanhas_nova_nome">
+        </div>
+        <div class="bloco">
+          <label>Narrador</label>
+          <input type="text" value="" id="campanhas_nova_narrador">
+        </div>
+        <div class="bloco">
+          <label>Sistema</label>
+          <select id="campanhas_nova_sistema" class="sistema"></select>
+        </div>
+        <div class="bloco bloco-botoes">
+          <button type="button" class="cancelar" id="campanhas_nova_cancelar">
+  					<img src="img/xmark-solid.svg">
+  					<span>Cancelar</span>
+  				</button>
+
+          <button type="button" id="campanhas_nova_salvar">
+  					<img src="img/floppy-disk-solid.svg">
+  					<span>Salvar</span>
+  				</button>
+        </div>
+      </div>
+
+      <div class="linhas" id="campanhas_listar">
+        <!--
+        <div class="linha">
+          <div class="bloco">
+            <label>Nome</label>
+            <input type="text" value="teste" readonly disabled>
+          </div>
+          <div class="bloco menor">
+            <label>Narrador</label>
+            <input type="text" value="SirLockee" readonly disabled>
+          </div>
+          <div class="bloco menor">
+            <label>Criação</label>
+            <input type="text" value="2025-05-12 19:34:26" readonly disabled>
+          </div>
+        </div>
+        -->
+      </div>
+      <!-- Campanhas Listar -->
+
+      <!-- Campanhas Editar -->
+      <div class="titulo titulo-editar" id="campanhas_editar">
+        <h2>Campanha</h2>
+        <button id="campanhas_editar_salvar">
+          <img src="img/floppy-disk-solid.svg" />
+          <span>Salvar</span>
+        </button>
+        <button id="campanhas_editar_atualizar">
+          <img src="img/rotate-right-solid.svg" />
+          <span>Atualizar</span>
+        </button>
+      </div>
+
+      <div class="linha linha-editar" id="campanhas_editar_form">
+        <input type="hidden" value="" id="campanhas_editar_uuid">
+        <input type="hidden" value="" id="campanhas_editar_url">
+
+        <div class="bloco menor">
+          <label for="campanhas_editar_nome">Nome</label>
+          <input type="text" value="" id="campanhas_editar_nome" name="campanhas_editar_nome" readonly disabled>
+        </div>
+        <div class="bloco menor menor-direita">
+          <label>Sistema</label>
+          <!-- <input type="text" value="" id="campanhas_editar_sistema" readonly disabled> -->
+          <select id="campanhas_editar_sistema" class="sistema"></select>
+        </div>
+
+        <div class="bloco menor">
+          <label for="campanhas_editar_narrador">Narrador</label>
+          <input type="text" value="" id="campanhas_editar_narrador" name="campanhas_editar_narrador" readonly disabled>
+        </div>
+        <div class="bloco menor menor-direita">
+          <label>Criação</label>
+          <input type="text" value="" id="campanhas_editar_data_cadastro" readonly disabled>
+        </div>
+
+        <div class="permissao" id="campanhas_editar_permissao">
+
+          <!-- Permissão -->
+          <div class="bloco menor bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_controlar_peso" name="campanhas_editar_controlar_peso">
+            <label for="campanhas_editar_controlar_peso">Controlar peso dos itens</label>
+          </div>
+          <div class="bloco menor menor-direita bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_incluir_item" name="campanhas_editar_permitir_incluir_item">
+            <label for="campanhas_editar_permitir_incluir_item">Permitir incluir item</label>
+          </div>
+          <div class="bloco menor bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_alterar_item" name="campanhas_editar_permitir_alterar_item">
+            <label for="campanhas_editar_permitir_alterar_item">Permitir alterar item</label>
+          </div>
+          <div class="bloco menor menor-direita bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_alterar_quantidade_item" name="campanhas_editar_permitir_alterar_quantidade_item">
+            <label for="campanhas_editar_permitir_alterar_quantidade_item">Permitir alterar a quantidade do item</label>
+          </div>
+          <div class="bloco menor bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_excluir_item" name="campanhas_editar_permitir_excluir_item">
+            <label for="campanhas_editar_permitir_excluir_item">Permitir excluir item</label>
+          </div>
+          <div class="bloco menor menor-direita bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_entregar_item" name="campanhas_editar_permitir_entregar_item">
+            <label for="campanhas_editar_permitir_entregar_item">Permitir entregar item</label>
+          </div>
+          <div class="bloco menor bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_alterar_moedas" name="campanhas_editar_permitir_alterar_moedas">
+            <label for="campanhas_editar_permitir_alterar_moedas">Permitir alterar moedas</label>
+          </div>
+          <div class="bloco menor menor-direita bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_entregar_moedas" name="campanhas_editar_permitir_entregar_moedas">
+            <label for="campanhas_editar_permitir_entregar_moedas">Permitir entregar moedas</label>
+          </div>
+
+          <div class="bloco">
+            <label for="campanhas_editar_uuid_medida_padrao" class="maior">Medida Padrão</label>
+            <select id="campanhas_editar_uuid_medida_padrao" name="campanhas_editar_uuid_medida_padrao"></select>
+          </div>
+
+          <div class="bloco bloco-atencao">
+            <label>Caso não seja selecionada nenhuma moeda, a campanha terá Peças de Ouro, Prata e Cobre por padrão.</label>
+          </div>
+
+          <div class="bloco bloco-subtitulo">
+            <label class="subtitulo">Moedas disponíveis na campanha</label>
+          </div>
+          <div class="lista" id="campanhas_editar_moedas_utilizadas">
+            <!--
+            <div class="bloco menor bloco-checkbox">
+              <input type="checkbox">
+              <label>Peça de Cerâmica (pc)</label>
+            </div>
+            <div class="bloco menor menor-direita bloco-checkbox">
+              <input type="checkbox">
+              <label>Peça de Cobre (pc)</label>
+            </div>
+            -->
+          </div>
+
+          <div class="bloco bloco-atencao">
+            <label>Atenção: salve o "Link do Narrador". Somente por ele você poderá acessar esta página de configuração.</label>
+          </div>
+
+          <div class="bloco bloco-subtitulo bloco-cor">
+            <label class="subtitulo">Link do Narrador</label>
+            <button type="button" id="campanhas_editar_url_narrador_botao">
+    					<img src="img/copy-regular.svg">
+    					<span>Copiar</span>
+    				</button>
+          </div>
+          <div class="bloco bloco-link">
+            <label class="link">
+              <a href="" url="" id="campanhas_editar_url_narrador"></a>
+            </label>
+          </div>
+
+          <div class="bloco bloco-subtitulo bloco-cor">
+            <label class="subtitulo">Link dos Jogadores</label>
+            <button type="button" id="campanhas_editar_url_jogador_botao">
+    					<img src="img/copy-regular.svg">
+    					<span>Copiar</span>
+    				</button>
+          </div>
+          <div class="bloco bloco-link">
+            <label class="link">
+              <a href="" url="" id="campanhas_editar_url_jogador"></a>
+            </label>
+          </div>
+
+          <div class="bloco bloco-subtitulo bloco-cor">
+            <label class="subtitulo">Link de Visualização</label>
+            <button type="button" id="campanhas_editar_url_visualizador_botao">
+    					<img src="img/copy-regular.svg">
+    					<span>Copiar</span>
+    				</button>
+          </div>
+          <div class="bloco bloco-link">
+            <label class="link">
+              <a href="" url="" id="campanhas_editar_url_visualizador"></a>
+            </label>
+          </div>
+
+          <!-- Permissão -->
+        </div>
+
+      </div>
+      <!-- Campanhas Editar -->
+
+      <!-- Personagens Listar -->
+      <div class="titulo" id="personagens_listar_titulo">
+        <h2>Personagens</h2>
+        <button id="personagens_listar_inserir">
+          <img src="img/plus-solid.svg" />
+          <span>Inserir</span>
+        </button>
+      </div>
+
+      <div class="linha" id="personagens_novo">
+        <div class="bloco">
+          <label>Nome</label>
+          <input type="text" value="" id="personagens_novo_nome">
+        </div>
+        <div class="bloco">
+          <label>Jogador</label>
+          <input type="text" value="" id="personagens_novo_jogador">
+        </div>
+        <div class="bloco bloco-botoes">
+          <button type="button" class="cancelar" id="personagens_novo_cancelar">
+  					<img src="img/xmark-solid.svg">
+  					<span>Cancelar</span>
+  				</button>
+
+          <button type="button" id="personagens_novo_salvar">
+  					<img src="img/floppy-disk-solid.svg">
+  					<span>Salvar</span>
+  				</button>
+        </div>
+      </div>
+
+      <div class="linhas" id="personagens_listar">
+        <!--
+        <div class="linha" id="personagens_listar_sem_registros">
+          <div class="bloco">
+            <label class="sem-registros">Campanha sem personagens</label>
+          </div>
+        </div>
+        -->
+      </div>
+      <!-- Personagens Listar -->
+
+      <!-- Personagens Editar -->
+      <div class="titulo titulo-editar" id="personagens_editar">
+        <h2>Personagem</h2>
+        <button id="personagens_editar_salvar">
+          <img src="img/floppy-disk-solid.svg" />
+          <span>Salvar</span>
+        </button>
+        <button id="personagens_editar_atualizar">
+          <img src="img/rotate-right-solid.svg" />
+          <span>Atualizar</span>
+        </button>
+      </div>
+
+      <div class="linha linha-editar" id="personagens_editar_form">
+
+        <input type="hidden" value="" id="personagens_editar_uuid">
+        <input type="hidden" value="" id="personagens_editar_url">
+        <input type="hidden" value="" id="personagens_editar_uuid_campanha">
+
+        <div class="bloco menor">
+          <label for="personagens_editar_nome">Nome</label>
+          <input type="text" value="" id="personagens_editar_nome" name="personagens_editar_nome" readonly disabled>
+        </div>
+        <div class="bloco menor menor-direita">
+          <label for="personagens_editar_jogador">Jogador</label>
+          <input type="text" value="" id="personagens_editar_jogador" name="personagens_editar_jogador" readonly disabled>
+        </div>
+
+        <div class="permissao" id="personagens_editar_controlar_peso">
+          <!-- Permissão -->
+
+          <div class="bloco menor">
+            <label for="personagens_editar_peso_maximo" class="maior">Peso Máximo</label>
+            <input type="text" class="menor" value="" id="personagens_editar_peso_maximo" name="personagens_editar_peso_maximo" readonly disabled>
+          </div>
+          <div class="bloco menor menor-direita">
+            <label for="personagens_editar_medida">Medida</label>
+            <input type="text" value="" id="personagens_editar_medida" name="personagens_editar_medida" readonly disabled>
+          </div>
+
+          <!-- Permissão -->
+        </div>
+
+        <div class="bloco bloco-subtitulo">
+          <label class="subtitulo">Moedas do Personagem</label>
+        </div>
+        <div class="lista" id="personagens_editar_moedas">
+          <!--
+          <div class="bloco menor">
+            <label class="moeda">Peça de Cerâmica (pc)</label>
+            <input class="moeda" type="number" value="">
+          </div>
+          <div class="bloco menor menor-direita">
+            <label class="moeda">Bits (1/10 Peça de Cerâmica)</label>
+            <input class="moeda" type="number" value="">
+          </div>
+          -->
+        </div>
+
+        <div class="permissao" id="personagens_editar_permissao">
+          <!-- Permissão -->
+
+          <div class="bloco bloco-atencao">
+            <label>Atenção: passe o "Link do Jogador" para o jogador para que ele possa gerenciar seus itens.</label>
+          </div>
+
+          <div class="bloco bloco-subtitulo bloco-cor">
+            <label class="subtitulo">Link do Narrador</label>
+            <button type="button" id="personagens_editar_url_narrador_botao">
+    					<img src="img/copy-regular.svg">
+    					<span>Copiar</span>
+    				</button>
+          </div>
+          <div class="bloco bloco-link">
+            <label class="link">
+              <a href="" url="" id="personagens_editar_url_narrador"></a>
+            </label>
+          </div>
+
+          <div class="bloco bloco-subtitulo bloco-cor">
+            <label class="subtitulo">Link do Jogador</label>
+            <button type="button" id="personagens_editar_url_jogador_botao">
+    					<img src="img/copy-regular.svg">
+    					<span>Copiar</span>
+    				</button>
+          </div>
+          <div class="bloco bloco-link">
+            <label class="link">
+              <a href="" url="" id="personagens_editar_url_jogador"></a>
+            </label>
+          </div>
+
+          <div class="bloco bloco-subtitulo bloco-cor">
+            <label class="subtitulo">Link de Visualização</label>
+            <button type="button" id="personagens_editar_url_visualizador_botao">
+    					<img src="img/copy-regular.svg">
+    					<span>Copiar</span>
+    				</button>
+          </div>
+          <div class="bloco bloco-link">
+            <label class="link">
+              <a href="" url="" id="personagens_editar_url_visualizador"></a>
+            </label>
+          </div>
+
+          <!-- Permissão -->
+        </div>
+
+      </div>
+
+      <div class="titulo titulo-editar" id="personagens_editar_enviar_moedas">
+        <h2>Enviar moedas</h2>
+        <button id="personagens_editar_enviar_moedas_button">
+          <img src="img/share-from-square-solid.svg" />
+          <span>Enviar</span>
+        </button>
+      </div>
+
+      <div class="linha linha-editar" id="personagens_editar_form_enviar_moedas">
+
+        <div class="bloco menor">
+          <label class="enviar" for="personagens_editar_form_enviar_moedas_quantidade">Moedas</label>
+          <input class="enviar" type="number" min="0" value="0" id="personagens_editar_form_enviar_moedas_quantidade" name="personagens_editar_form_enviar_moedas_quantidade">
+          <select class="enviar" id="personagens_editar_form_enviar_moedas_moeda" name="personagens_editar_form_enviar_moedas_moeda">
+            <option>Selecione</option>
+          </select>
+        </div>
+        <div class="bloco menor menor-direita">
+          <label class="enviar" for="personagens_editar_form_enviar_moedas_personagem">Para</label>
+          <select class="enviar" id="personagens_editar_form_enviar_moedas_personagem" name="personagens_editar_form_enviar_moedas_personagem">
+            <option>Selecione</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="titulo titulo-editar" id="personagens_editar_alterar_campanhas">
+        <h2>Alterar Campanha</h2>
+        <button id="personagens_editar_alterar_campanhas_button">
+          <img src="img/share-from-square-solid.svg" />
+          <span>Alterar</span>
+        </button>
+      </div>
+
+      <div class="linha linha-editar" id="personagens_editar_form_alterar_campanhas">
+        <div class="bloco">
+          <label class="maior" for="personagens_editar_form_alterar_campanhas_campanha">Campanha</label>
+          <select id="personagens_editar_form_alterar_campanhas_campanha" name="personagens_editar_form_alterar_campanhas_campanha">
+            <option>Selecione</option>
+          </select>
+        </div>
+      </div>
+      <!-- Personagens Editar -->
+
+    </div>
+
+    <script src="js/palavras-proibidas.js"></script>
+    <script src="js/vanilla-toast.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+    <script type="text/javascript" src="js/rolador-inventario.js"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+TODO
+
+opcao de salvar campanha deve validar hash salvo no localStorage
+criar opçao de salvar campanha
+
+Lista de personagens
+Colocar rota pra hash até de personagens

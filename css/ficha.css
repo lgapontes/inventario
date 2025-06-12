@@ -1,0 +1,447 @@
+
+      /*
+      * {
+        padding: 2px !important;
+      }
+      */
+
+      body {
+        /*
+        font-family: Consolas, "Lucida Console", Courier, mono !important;
+        font-size: 12px !important;
+        color: rgb(5, 5, 5) !important;
+        */
+      }
+
+      /* ANTIGO */
+      div {
+        /*
+        width: auto !important;
+        display: block;
+        box-sizing: border-box !important;
+        font-family: Consolas, "Lucida Console", Courier, mono !important;
+        font-size: 1em !important;
+        */
+      }
+
+      div#ficha > div > table {
+        width: 800px !important;
+        max-width: 95% !important;
+        min-width: 380px !important;
+
+        box-sizing: border-box !important;
+        display: block !important;
+        margin: 0 auto !important;
+
+        word-wrap: break-word !important;
+      }
+
+      div#ficha > div > table > tbody > tr > td > table {
+        width: auto !important;
+        max-width: auto !important;
+        min-width: auto !important;
+
+        box-sizing: border-box !important;
+        display: block !important;
+        margin: 0 auto !important;
+
+        word-wrap: break-word !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(7) > td:nth-child(2) > table > tbody  {
+        padding: 0 !important;
+      }
+      div#ficha > div > table > tbody > tr:nth-child(7) > td:nth-child(2) > table > tbody > tr > td:nth-child(2) {
+        padding: 0 !important;
+      }
+      div#ficha > div > table > tbody > tr:nth-child(7) > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > table > tbody {
+        /* width: 210px !important; */
+        padding: 0 !important;
+      }
+      div#ficha > div > table > tbody > tr:nth-child(7) > td:nth-child(2) > table > tbody > tr > td:nth-child(2) {
+        border: 0 !important;
+        width: 100%;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(7) > td:nth-child(2) > table > tbody > tr > td:last-child > table > tbody > tr:nth-child(5) > td:last-child {
+        width: 100px !important;
+        white-space: normal !important;
+      }
+      div#ficha > div > table > tbody > tr:nth-child(7) > td:nth-child(2) > table > tbody > tr > td:last-child > table > tbody > tr > td:last-child {
+        background-color: inherit !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(12) > td:nth-child(2) > table > tbody > tr > td:last-child {
+        white-space: normal !important;
+        background-color: inherit !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(13) > td:nth-child(2) > table > tbody > tr > td:last-child {
+        white-space: normal !important;
+        background-color: inherit !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(14) > td:nth-child(2) > table > tbody > tr > td:last-child {
+        white-space: normal !important;
+        background-color: inherit !important;
+      }
+
+      div#ficha > div > table {
+        background-image: url(../img/background.jpg);
+        border: 1px solid #000;
+        border-right: 0;
+        box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.3);
+      }
+
+      div#ficha > div > table > tbody > tr {
+        margin-bottom: 4px !important;
+      }
+
+      table > tbody {
+        box-sizing: border-box !important;
+        display: block !important;
+        margin: 0 auto !important;
+      }
+      thead tr th {
+        display: none;
+      }
+      td {
+        font-size: 0.85em !important;
+        box-sizing: border-box !important;
+        padding: 2px !important;
+      }
+
+      div#ficha > div > table > tbody > tr > td:nth-child(odd) {
+        max-width: 100px;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(6) > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td {
+        font-size: 0.9em !important;
+      }
+      tbody tr td {
+        background-color: inherit !important;
+        box-sizing: border-box !important;
+      }
+      tbody tr td:first-child {
+        font-weight: bold;
+        font-size: 0.75em !important;
+        width: auto !important;
+        border: 0 !important;
+        background-color: inherit !important;
+        box-sizing: border-box !important;
+        padding: 2px !important;
+        padding-right: 4px !important;
+      }
+
+      tbody tr td tbody tr td tbody tr td:last-child {
+        border: 0 !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(5) td tbody tr td:last-child {
+        border: 0 !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(6) td tbody tr td:last-child {
+        border: 0 !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(8) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(9) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(10) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(11) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(12) td tbody tr td:last-child {
+        /* background-color: rgba(0,0,0,0.1) !important; */
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(13) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+
+      tbody tr:nth-child(14) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100% !important;
+      }
+
+      tbody tr:nth-child(15) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100% !important;
+      }
+
+      tbody tr:nth-child(16) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+      tbody tr:nth-child(17) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+      tbody tr:nth-child(18) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+      tbody tr:nth-child(19) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+      tbody tr:nth-child(20) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+      tbody tr:nth-child(21) td tbody tr td:last-child {
+        border: 0 !important;
+        white-space: normal !important;
+        width: 100%;
+      }
+
+      td {
+        /* max-width: 290px !important; */
+      }
+      #ficha {
+        display: none;
+        margin: 0 auto !important;
+        margin-bottom: 30px !important;
+      }
+
+      #ficha-itens-loot,
+      #ficha-itens-armeiro,
+      #ficha-itens-taverna,
+      #ficha-itens-alfaiataria {
+        position: relative;
+        display: none;
+        margin: 0 auto;
+        margin-bottom: 10px;
+
+        width: 800px;
+        max-width: 95%;
+        min-width: 380px;
+
+        box-sizing: border-box;
+
+        background-image: url(../img/background.jpg);
+
+        border: 2px solid #000;
+        box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.3);
+
+        padding: 7px;
+      }
+
+      #ficha-npcs, #ficha-grimorio {
+        position: relative;
+        display: none;
+        margin: 0 auto;
+        margin-bottom: 10px;
+
+        width: 800px;
+        max-width: 95%;
+        min-width: 380px;
+        height: 500px;
+
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        font-size: 1.1em;
+
+        box-sizing: border-box;
+
+        background-image: url(../img/background.jpg);
+
+        border: 2px solid #000;
+        box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.3);
+
+        padding: 7px;
+        resize: none;
+      }
+
+      #ficha-grimorio {
+        height: 800px;
+      }
+
+      #ficha-itens-loot {
+        margin-top: 0;
+      }
+
+      /*
+      button {
+        background-color: #ddd;
+      }
+      label {
+        display: block;
+        float: left;
+        margin-top: 1px;
+        margin-right: 5px;
+      }
+      input[type=radio] {
+        margin-top: 1px;
+        margin-bottom: 5px;
+        display: block;
+        float: left;
+      }
+      */
+
+      div.fb-like {
+        display: block;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      div.classes a {
+        color: #fff;
+      }
+
+      /* Ajuste fino */
+
+
+      div#ficha > div > table > tbody > tr > td > table {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      div#ficha > div > table > tbody > tr > td > table > tbody {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      div#ficha > div > table > tbody > tr > td > table > tbody > tr:nth-child(odd) {
+        background-color: rgba(0,0,0,0.1) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      div#ficha > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) {
+        width: auto !important;
+        max-width: 100px !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      div#ficha > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) {
+        width: auto !important;
+        max-width: none !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      div#ficha > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td {
+        width: auto !important;
+        max-width: none !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      /* Magias Divinas */
+      div#ficha > div > table > tbody > tr:nth-child(12) > td > table > tbody > tr {
+        background-color: rgba(0,0,0,0) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(12) > td > table > tbody > tr > td > table > tbody > tr:nth-child(odd) {
+        background-color: rgba(0,0,0,0.1) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+      /* Magias Divinas */
+
+      /* Grimório */
+      div#ficha > div > table > tbody > tr:nth-child(13) > td > table > tbody > tr {
+        background-color: rgba(0,0,0,0) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(13) > td > table > tbody > tr > td > table > tbody > tr:nth-child(odd) {
+        background-color: rgba(0,0,0,0.1) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+      /* Grimório */
+
+      /* Magia Cigana */
+      div#ficha > div > table > tbody > tr:nth-child(14) > td > table > tbody > tr {
+        background-color: rgba(0,0,0,0) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+
+      div#ficha > div > table > tbody > tr:nth-child(14) > td > table > tbody > tr > td > table > tbody > tr:nth-child(odd) {
+        background-color: rgba(0,0,0,0.1) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+      }
+      /* Magia Cigana */
+
+      tbody > tr > td:first-child {
+        border: 1px solid #000 !important;
+      }
+
+      tbody > tr > td tbody > tr > td:first-child {
+        border: 0 !important;
+      }
+
+      @media (min-width: 800px) {
+        div#ficha > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) {
+          width: auto !important;
+          max-width: none !important;
+          word-wrap: break-word !important;
+          white-space: normal !important;
+        }
+
+        #ficha-npcs {
+          height: 340px;
+        }
+
+        #ficha-grimorio {
+          height: 540px;
+        }
+      }

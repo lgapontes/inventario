@@ -1,0 +1,24 @@
+Iniciar servidor:
+mysqld.exe
+
+Entrar no prompt:
+mysql -u root -p
+
+Alterar password:
+ALTER USER 'root'@'localhost' IDENTIFIED BY '123eja';
+
+Criar database:
+CREATE DATABASE linuc318_inventario CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+Carregar arquivo banco:
+mysql -u root -p linuc318_inventario < C:\dev\repositories\adnd\dados\linuc318_inventario.sql
+
+---------------------------
+
+
+C:\dev\mysql\mysql-9.3.0-winx64\bin
+
+Instalar localmente:
+https://vikramshanbogar.medium.com/mysql-portable-install-a7df689e9c20
+
+mysqld --initialize-insecure --datadir=C:/dev/mysql/mysqldata

@@ -1,0 +1,21 @@
+C:\dev\apache\Apache24\bin
+
+httpd.exe
+
+----------------------------------------
+
+Como instalar PHP:
+https://www.youtube.com/watch?app=desktop&v=Bb21iI6yoUE
+https://windows.php.net/download/
+
+Como instalar Apache:
+https://www.apachelounge.com/download/#google_vignette
+
+  Open a command prompt window and cd to the c:\Apache24\bin folder.
+  
+  To Start Apache in the command prompt type:
+  
+   >httpd.exe
+
+
+https://httpd.apache.org/docs/2.4/vhosts/examples.html
