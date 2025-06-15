@@ -5,7 +5,7 @@
 const URL_REMOTA = 'https://www.flechamagica.com.br/aded2';
 const URL_LOCAL = 'http://localhost';
 const LOCALHOST = true;
-const VARIAVEL_EXCLUIR = 'registro-excluido';
+const VARIAVEL_MENSAGEM = 'registro-mensagem';
 
 function createURL(path) {
   return `${(LOCALHOST ? URL_LOCAL : URL_REMOTA)}/api/${path}`;
@@ -1500,15 +1500,10 @@ function personagens_editar_alterar_campanhas_button(event) {
     json,
     (json_retorno)=>{
       /* Campanha alterada */
-      router('personagens_editar');
 
-      /* Permissões */
-      personagensConverterPermissoes(json_retorno);
+      localStorage.setItem(VARIAVEL_MENSAGEM, 'O Personagem foi alterado de Campanha com sucesso!');
+      header_botao_voltar();
 
-      render_personagens_editar(json_retorno,()=>{
-        closeLoading();
-        renderToast('Campanha alterada com sucesso!');
-      });
       /* Campanha alterada */
     },
     (erro)=>{
@@ -1528,14 +1523,15 @@ function modal_fechar(event) {
   event.preventDefault();
   document.getElementById('modal_pagina').value = '';
   document.getElementById('modal_uuid').value = '';
+  document.getElementById('modal_mensagem').value = '';
   esconder_elemento('modal');
 }
 
-function verificar_excluido() {
-  let foiExcluido = localStorage.getItem(VARIAVEL_EXCLUIR);
-  if (foiExcluido == 'sim') {
-    localStorage.removeItem(VARIAVEL_EXCLUIR);
-    renderToast('Registro excluído com sucesso!');
+function verificar_mensagem() {
+  let existeMensagem = localStorage.getItem(VARIAVEL_MENSAGEM);
+  if ( (existeMensagem) && (existeMensagem != '') ) {
+    localStorage.removeItem(VARIAVEL_MENSAGEM);
+    renderToast(existeMensagem);
   }
 }
 
@@ -1543,6 +1539,7 @@ function modal_excluir(event) {
   event.preventDefault();
   let pagina = document.getElementById('modal_pagina').value;
   let uuid = document.getElementById('modal_uuid').value;
+  let mensagem = document.getElementById('modal_mensagem').value;
 
   if ( (stringEhValida(pagina)) && (uuidEhValido(uuid)) ) {
     openLoading();
@@ -1550,7 +1547,7 @@ function modal_excluir(event) {
       createURL(pagina),
       uuid,
       ()=>{
-        localStorage.setItem(VARIAVEL_EXCLUIR, 'sim');
+        localStorage.setItem(VARIAVEL_MENSAGEM, mensagem);
         header_botao_voltar();
       },
       (erro)=>{
@@ -1563,16 +1560,17 @@ function modal_excluir(event) {
   }
 }
 
-function renderModalExcluir(pagina,uuid) {
+function renderModalExcluir(pagina,uuid,mensagem) {
   document.getElementById('modal_pagina').value = pagina;
   document.getElementById('modal_uuid').value = uuid;
+  document.getElementById('modal_mensagem').value = mensagem;
   mostrar_elemento('modal');
 }
 
 function campanhas_excluir_botao(event) {
   event.preventDefault();
   let uuid = document.getElementById('campanhas_editar_uuid').value;
-  renderModalExcluir('campanhas.php',uuid);
+  renderModalExcluir('campanhas.php',uuid,'Campanha excluída com sucesso!');
 }
 
 function definirListeners() {
@@ -1833,7 +1831,7 @@ function iniciar() {
         editarPersonagens(pagina);
       }
 
-      verificar_excluido();
+      verificar_mensagem();
     } else {
       closeLoading();
     }
