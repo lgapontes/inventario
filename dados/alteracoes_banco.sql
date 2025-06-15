@@ -18,3 +18,5 @@ alter table itens_base add column `uuid_sistema` char(36) CHARACTER SET utf8mb4 
 alter table campanhas add column `uuid_sistema` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT null default 'a66888e0-5259-424f-be09-c641b0040bc9';
 
 alter table campanhas alter column `uuid_sistema` drop default;
+
+alter table personagens add column `data_exclusao` timestamp NULL DEFAULT NULL;

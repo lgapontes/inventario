@@ -27,7 +27,7 @@ div.loading {
   background-color: #fdeec5;
   opacity: .6;
   filter: alpha(opacity=60);
-  z-index: 3;
+  z-index: 5;
 
   background-image: url(../img/loading.gif);
   background-repeat: no-repeat;
@@ -37,6 +37,132 @@ div.loading {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
 }
+
+/* MODAL */
+
+div.modal {
+  display: none;
+
+  background-color: rgba(253, 238, 197, .6);
+  z-index: 3;
+
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+div.modal > div.form {
+  display: block;
+  width: 350px;
+  box-sizing: border-box;
+
+  margin: 150px auto 0 auto;
+  padding: 0;
+  border: 0;
+}
+
+div.modal > div.form > div.titulo {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+
+  background-image: linear-gradient(#4b3921, #000000) !important;
+  margin: 0;
+  border-radius: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  box-sizing: border-box;
+  padding: 5px 0 5px 15px;
+}
+
+div.modal > div.form > div.titulo > h2 {
+  display: block;
+  float: left;
+  font-size: 1.5em;
+  color: #ffffff;
+}
+
+div.modal > div.form > div.titulo > button {
+  display: block;
+  float: right;
+  margin-right: 15px;
+  margin-top: 0.5px;
+  font-size: 1em;
+  color: #ffffff;
+  background-color: #7b6951;
+  box-shadow: 1px 1px 2px #ffffff;
+  border-radius: 4px;
+}
+
+div.modal > div.form > div.titulo > button:hover {
+  background-color: #5b4931;
+}
+
+div.modal > div.form > div.titulo > button > img {
+  display: block;
+  float: left;
+  margin: 0;
+  height: 20px;
+  width: 20px;
+}
+
+div.modal > div.form > div.linha {
+  display: block;
+  width: 100%;
+  height: 100px;
+  box-sizing: border-box;
+
+  background-image: url(../img/background.jpg);
+  padding: 0 15px 5px 15px;
+  border: 2px solid #000000;
+
+  margin: 0 auto 5px auto;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+div.modal > div.form > div.linha > div.bloco {
+  width: 100%;
+  display: block;
+  float: left;
+  margin-top: 5px;
+  min-height: 26px;
+}
+
+div.modal > div.form > div.linha > div.bloco > label {
+  display: block;
+  float: left;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: bold;
+}
+
+div.modal > div.form > div.linha > div.bloco-botoes {
+  margin-top: 15px;
+}
+
+div.modal > div.form > div.linha > div.bloco-botoes > button[type=button] {
+  float: right;
+}
+
+div.modal > div.form > div.linha > div.bloco-botoes > button[type=button]:focus {
+  float: right;
+  background-color: #df562c;
+}
+
+div.modal > div.form > div.linha > div.bloco-botoes > button[type=button].cancelar {
+  float: left;
+  background-color: #ff865c;
+}
+
+div.modal > div.form > div.linha > div.bloco-botoes > button[type=button].cancelar:focus,
+div.modal > div.form > div.linha > div.bloco-botoes > button[type=button].cancelar:hover {
+  float: left;
+  background-color: #ef764c;
+}
+
+/* MODAL */
 
 /* HEADER */
 
@@ -718,7 +844,7 @@ div.inventario div.erro {
   background-image: url(../img/erro.jpg);
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: 0 -240px;
+  background-position: 0 -210px;
 
   margin: 5px auto 5px auto;
   border-radius: 5px;
@@ -981,6 +1107,10 @@ div.inventario div.linha div.bloco-atencao {
   margin-top: 10px;
 }
 
+div.inventario div.linha div.bloco-atencao-excluir {
+  margin-top: 5px;
+}
+
 div.inventario div.linha div.bloco-atencao > label {
   display: block;
   float: left;
@@ -1105,6 +1235,18 @@ div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:hov
 }
 
 #personagens_editar_form_alterar_campanhas {
+  display: none;
+}
+
+#modal {
+  display: none;
+}
+
+#campanhas_excluir {
+  display: none;
+}
+
+#campanhas_excluir_form {
   display: none;
 }
 

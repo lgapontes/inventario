@@ -89,61 +89,30 @@
             $entrada = json_decode($body,true);
 
             if (
-                !array_key_exists("url",$entrada) ||
-                !array_key_exists("uuid",$entrada) ||
-                !array_key_exists("uuid_campanha",$entrada) ||
-                !array_key_exists("nome",$entrada) ||
-                !array_key_exists("jogador",$entrada) ||
-                !array_key_exists("peso_maximo",$entrada) ||
-                !array_key_exists("moedas",$entrada) ||
-                !array_key_exists("url_narrador",$entrada) ||
-                !array_key_exists("url_jogador",$entrada) ||
-                !array_key_exists("url_visualizador",$entrada) ||
-                !array_key_exists("eh_narrador",$entrada) ||
-                !array_key_exists("eh_jogador",$entrada) ||
-                !array_key_exists("eh_visualizador",$entrada)
+                array_key_exists("url",$entrada) &&
+                array_key_exists("uuid",$entrada) &&
+                array_key_exists("uuid_campanha",$entrada) &&
+                array_key_exists("nome",$entrada) &&
+                array_key_exists("jogador",$entrada) &&
+                array_key_exists("peso_maximo",$entrada) &&
+                array_key_exists("moedas",$entrada) &&
+                array_key_exists("url_narrador",$entrada) &&
+                array_key_exists("url_jogador",$entrada) &&
+                array_key_exists("url_visualizador",$entrada) &&
+                array_key_exists("eh_narrador",$entrada) &&
+                array_key_exists("eh_jogador",$entrada) &&
+                array_key_exists("eh_visualizador",$entrada)
             ) {
-                header("HTTP/1.1 400");
-                die();
-            }
-
-            // Validar permissão
-            $lista = obterPersonagem($conexao,$entrada['url']);
-
-            if (count($lista) == 1) {
-              // Personagem obtido
-              $personagem_obtido = $lista[0];
-
-              if (
-                (verificarBoolean($personagem_obtido,"eh_narrador") == $entrada["eh_narrador"]) &&
-                (verificarBoolean($personagem_obtido,"eh_jogador") == $entrada["eh_jogador"]) &&
-                (verificarBoolean($personagem_obtido,"eh_visualizador") == $entrada["eh_visualizador"]) && (
-                  verificarBoolean($personagem_obtido,"eh_narrador") || verificarBoolean($personagem_obtido,"eh_jogador")
-                )
-              ) {
-                // Alteração permitida
-
-                $resultado = alterarPersonagem($conexao,$entrada);
-
-                if ($resultado) {
-                    obterDadosPersonagem($conexao,$resultado);
-                } else {
-                    header("HTTP/1.1 400");
-                    die();
-                }
-
-                // Alteração permitida
-              } else {
-                header("HTTP/1.1 401");
-                die();
-              }
-
-              // Personagem obtido
+              alterarDadosPersonagem($conexao,$entrada);
+            } elseif (
+              array_key_exists("url",$entrada) &&
+              array_key_exists("campanha",$entrada)
+            ) {
+              alterarDadosCampanhaPersonagem($conexao,$entrada);
             } else {
               header("HTTP/1.1 400");
               die();
             }
-            // Validar permissão
 
         } else if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
@@ -169,17 +138,22 @@
 
         } else if ($_SERVER["REQUEST_METHOD"] === "DELETE") {
 
-            if (
-                !array_key_exists("uuid",$_GET)
-            ) {
-                header("HTTP/1.1 400");
-                die();
-            } else {
-                excluirPersonagem($conexao,$_GET['uuid']);
+          header("HTTP/1.1 405");
+          die();
 
-                header("HTTP/1.1 200");
-                die();
-            }
+          /*
+          if (
+              !array_key_exists("uuid",$_GET)
+          ) {
+              header("HTTP/1.1 400");
+              die();
+          } else {
+              excluirPersonagem($conexao,$_GET['uuid']);
+
+              header("HTTP/1.1 200");
+              die();
+          }
+          */
 
         } else {
             header("HTTP/1.1 405");

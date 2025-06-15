@@ -1,5 +1,5 @@
 <?php
-    
+
     include("banco.php");
 
     try {
@@ -10,12 +10,12 @@
 
             header("Access-Control-Allow-Methods: GET,POST,OPTIONS,DELETE,PUT");
             die();
-        
+
         } else if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $body = file_get_contents("php://input");
             $entrada = json_decode($body,true);
-            
+
             if (
                 !array_key_exists("uuid",$entrada) ||
                 !array_key_exists("medida",$entrada) ||
@@ -28,13 +28,13 @@
             inserirMedida($conexao,$entrada);
 
             header("HTTP/1.1 200");
-            die();       
-        
+            die();
+
         } else if ($_SERVER["REQUEST_METHOD"] === "PUT") {
 
             $body = file_get_contents("php://input");
             $entrada = json_decode($body,true);
-            
+
             if (
                 !array_key_exists("uuid",$entrada) ||
                 !array_key_exists("medida",$entrada) ||
@@ -47,16 +47,16 @@
             $resultado = alterarMedida($conexao,$entrada);
 
             if ($resultado) {
-                
+
                 if (count($resultado) == 1) {
                     header('Content-Type: application/json');
                     echo json_encode($resultado[0],JSON_UNESCAPED_UNICODE);
-                    die();    
+                    die();
                 } else {
                     header("HTTP/1.1 400");
                     die();
                 }
-                
+
             } else {
                 header("HTTP/1.1 400");
                 die();
@@ -73,7 +73,7 @@
                 die();
             } else {
                 $lista = obterMedida($conexao,$_GET['uuid']);
-                
+
                 if (count($lista) == 1) {
                     header('Content-Type: application/json');
                     echo json_encode($lista[0], JSON_UNESCAPED_UNICODE);
@@ -83,21 +83,26 @@
                     die();
                 }
             }
-            
+
 
         } if ($_SERVER["REQUEST_METHOD"] === "DELETE") {
 
-            if (
-                !array_key_exists("uuid",$_GET)
-            ) {
-                header("HTTP/1.1 400");
-                die();
-            } else {
-                excluirMedida($conexao,$_GET['uuid']);
-                
-                header("HTTP/1.1 200");
-                die();
-            }
+          header("HTTP/1.1 405");
+          die();
+
+          /*
+          if (
+              !array_key_exists("uuid",$_GET)
+          ) {
+              header("HTTP/1.1 400");
+              die();
+          } else {
+              excluirMedida($conexao,$_GET['uuid']);
+
+              header("HTTP/1.1 200");
+              die();
+          }
+          */
 
         } else {
             header("HTTP/1.1 405");

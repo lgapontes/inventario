@@ -72,18 +72,24 @@
             data_exclusao is null),FALSE) as eh_visualizador_campanha,
 
             IFNULL((select TRUE from personagens
+            inner join campanhas on campanhas.uuid = personagens.uuid_campanha
             where
-            url_narrador = ?
+            personagens.url_narrador = ? and
+            campanhas.data_exclusao is null
             ),FALSE) as eh_narrador_personagem,
 
             IFNULL((select TRUE from personagens
+            inner join campanhas on campanhas.uuid = personagens.uuid_campanha
             where
-            url_jogador = ?
+            personagens.url_jogador = ? and 
+            campanhas.data_exclusao is null
             ),FALSE) as eh_jogador_personagem,
 
             IFNULL((select TRUE from personagens
+            inner join campanhas on campanhas.uuid = personagens.uuid_campanha
             where
-            url_visualizador = ?
+            personagens.url_visualizador = ? and
+            campanhas.data_exclusao is null
             ),FALSE) as eh_visualizador_personagem
         QUERY;
 
@@ -584,6 +590,12 @@
     function excluirCampanha($conexao,$uuid) {
         $query = 'delete from campanhas where uuid = ?';
 
+        $query = <<<QUERY
+          update campanhas set
+            data_exclusao = now()
+          where uuid = ?
+        QUERY;
+
         $resultado = $conexao->execute_query($query,[$uuid]);
 
         if (!$resultado) {
@@ -786,10 +798,14 @@
             '$qual_url' as qual_url
         from personagens
         inner join medidas on medidas.uuid = personagens.uuid_medida_peso_maximo
+        inner join campanhas on campanhas.uuid = personagens.uuid_campanha
+        where campanhas.$qual_url = ?
         order by personagens.nome, personagens.jogador
         QUERY;
 
-        $resultado = $conexao->execute_query($query, []);
+        // echo $query;
+
+        $resultado = $conexao->execute_query($query, [$url]);
 
         if (!$resultado) {
             throw new Exception("Erro no banco de dados: " . $conexao->error);

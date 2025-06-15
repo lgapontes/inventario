@@ -119,3 +119,82 @@
           die();
       }
     }
+
+    function alterarDadosPersonagem($conexao,$entrada) {
+      // Validar permissão
+      $lista = obterPersonagem($conexao,$entrada['url']);
+
+      if (count($lista) == 1) {
+        // Personagem obtido
+        $personagem_obtido = $lista[0];
+
+        if (
+          (verificarBoolean($personagem_obtido,"eh_narrador") == $entrada["eh_narrador"]) &&
+          (verificarBoolean($personagem_obtido,"eh_jogador") == $entrada["eh_jogador"]) &&
+          (verificarBoolean($personagem_obtido,"eh_visualizador") == $entrada["eh_visualizador"]) && (
+            verificarBoolean($personagem_obtido,"eh_narrador") || verificarBoolean($personagem_obtido,"eh_jogador")
+          )
+        ) {
+          // Alteração permitida
+
+          $resultado = alterarPersonagem($conexao,$entrada);
+
+          if ($resultado) {
+              obterDadosPersonagem($conexao,$resultado);
+          } else {
+              header("HTTP/1.1 400");
+              die();
+          }
+
+          // Alteração permitida
+        } else {
+          header("HTTP/1.1 401");
+          die();
+        }
+
+        // Personagem obtido
+      } else {
+        header("HTTP/1.1 400");
+        die();
+      }
+      // Validar permissão
+    }
+
+    function alterarDadosCampanhaPersonagem($conexao,$entrada) {
+      // Validar permissão
+      $lista = obterPersonagem($conexao,$entrada['url']);
+
+      if (count($lista) == 1) {
+        // Personagem obtido
+        $personagem_obtido = $lista[0];
+
+        if (verificarBoolean($personagem_obtido,"eh_narrador")) {
+          // Pode alterar
+
+          $resultado = alterarCampanhaPersonagem(
+            $conexao,
+            $entrada['url'],
+            $personagem_obtido['uuid'],
+            $entrada['campanha']
+          );
+
+          if ($resultado) {
+              obterDadosPersonagem($conexao,$resultado);
+          } else {
+              header("HTTP/1.1 400");
+              die();
+          }
+
+          // Pode alterar
+        } else {
+          header("HTTP/1.1 401");
+          die();
+        }
+
+        // Personagem obtido
+      } else {
+        header("HTTP/1.1 400");
+        die();
+      }
+      // Validar permissão
+    }

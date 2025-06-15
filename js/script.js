@@ -1,5 +1,5 @@
 /* version */
-const VERSION = '1.0.8';
+const VERSION = '1.0.1';
 let versao_texto = `Versão ${VERSION}`;
 
 /* Testes unitários */

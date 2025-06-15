@@ -106,28 +106,6 @@
                 die();
             } else {
                 obterDadosCampanha($conexao,$_GET['url']);
-
-                /*
-                $lista = obterCampanha($conexao,$_GET['url']);
-
-                if (count($lista) == 1) {
-                    header('Content-Type: application/json');
-
-                    $campanha = $lista[0];
-                    $retorno = array();
-                    $retorno['campanha'] = $campanha;
-                    $retorno['personagens'] = obterPersonagensPorCampanha($conexao,$campanha['uuid']);
-                    $retorno['moedas'] = obterMoedas($conexao);
-                    $retorno['moedas_utilizadas'] = obterMoedasUtilizadas($conexao,$campanha['uuid']);
-                    $retorno['medidas'] = obterMedidas($conexao);
-
-                    echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
-                    die();
-                } else {
-                    header("HTTP/1.1 404");
-                    die();
-                }
-                */
             }
 
 

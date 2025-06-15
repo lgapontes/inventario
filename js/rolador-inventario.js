@@ -5,6 +5,7 @@
 const URL_REMOTA = 'https://www.flechamagica.com.br/aded2';
 const URL_LOCAL = 'http://localhost';
 const LOCALHOST = true;
+const VARIAVEL_EXCLUIR = 'registro-excluido';
 
 function createURL(path) {
   return `${(LOCALHOST ? URL_LOCAL : URL_REMOTA)}/api/${path}`;
@@ -74,6 +75,10 @@ function itsTrue(valor) {
 
 function itsFalse(valor) {
   return valor === 0;
+}
+
+function isFunction(functionToCheck) {
+  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
 
 function disableInput(id) {
@@ -786,23 +791,29 @@ function render_campanhas_editar_permissoes(json) {
   document.getElementById('header-botao-voltar-url').value = window.location.pathname;
 
   if (itsTrue(json.campanha.eh_narrador)) {
-    document.getElementById('campanhas_editar_salvar').style.display = 'block';
+    mostrar_elemento('campanhas_editar_salvar');
     enableInput('campanhas_editar_nome');
     enableInput('campanhas_editar_narrador');
-    document.getElementById('campanhas_editar_permissao').style.display = 'block';
-    document.getElementById('personagens_listar_inserir').style.display = 'block';
+    mostrar_elemento('campanhas_editar_permissao');
+    mostrar_elemento('personagens_listar_inserir');
+    mostrar_elemento('campanhas_excluir');
+    mostrar_elemento('campanhas_excluir_form');
   } else if (itsTrue(json.campanha.eh_jogador)) {
-    document.getElementById('campanhas_editar_salvar').style.display = 'none';
+    esconder_elemento('campanhas_editar_salvar');
     disableInput('campanhas_editar_nome');
     disableInput('campanhas_editar_narrador');
-    document.getElementById('campanhas_editar_permissao').style.display = 'none';
-    document.getElementById('personagens_listar_inserir').style.display = 'block';
+    esconder_elemento('campanhas_editar_permissao');
+    mostrar_elemento('personagens_listar_inserir');
+    esconder_elemento('campanhas_excluir');
+    esconder_elemento('campanhas_excluir_form');
   } else {
-    document.getElementById('campanhas_editar_salvar').style.display = 'none';
+    esconder_elemento('campanhas_editar_salvar');
     disableInput('campanhas_editar_nome');
     disableInput('campanhas_editar_narrador');
-    document.getElementById('campanhas_editar_permissao').style.display = 'none';
-    document.getElementById('personagens_listar_inserir').style.display = 'none';
+    esconder_elemento('campanhas_editar_permissao');
+    esconder_elemento('personagens_listar_inserir');
+    esconder_elemento('campanhas_excluir');
+    esconder_elemento('campanhas_excluir_form');
   }
 }
 
@@ -1195,10 +1206,14 @@ function texto_botao_esconder_listener(event) {
   document.getElementById('texto-bloco').style.display = 'none';
 }
 
-function header_botao_voltar_listener(event) {
-  event.preventDefault();
+function header_botao_voltar() {
   let url = document.getElementById('header-botao-voltar-url').value;
   window.location.href = url;
+}
+
+function header_botao_voltar_listener(event) {
+  event.preventDefault();
+  header_botao_voltar();
 }
 
 function campanhas_nova_cancelar_listener(event) {
@@ -1479,11 +1494,93 @@ function personagens_editar_alterar_campanhas_button(event) {
   };
   obterValorSelect(json,'personagens_editar_form_alterar_campanhas_campanha');
 
-  console.log(json);
-  // AQUI
+  openLoading();
+  alterar(
+    createURL('personagens.php'),
+    json,
+    (json_retorno)=>{
+      /* Campanha alterada */
+      router('personagens_editar');
+
+      /* Permissões */
+      personagensConverterPermissoes(json_retorno);
+
+      render_personagens_editar(json_retorno,()=>{
+        closeLoading();
+        renderToast('Campanha alterada com sucesso!');
+      });
+      /* Campanha alterada */
+    },
+    (erro)=>{
+      closeLoading();
+      if (erro == '400: Bad Request') {
+        console.warn(erro);
+        renderWarningToast('Os dados para enviar Moedas estão incorretos!');
+      } else {
+        console.error(erro);
+        renderErrorToast('Ocorreu um erro ao enviar as moedas!');
+      }
+    },
+  );
+}
+
+function modal_fechar(event) {
+  event.preventDefault();
+  document.getElementById('modal_pagina').value = '';
+  document.getElementById('modal_uuid').value = '';
+  esconder_elemento('modal');
+}
+
+function verificar_excluido() {
+  let foiExcluido = localStorage.getItem(VARIAVEL_EXCLUIR);
+  if (foiExcluido == 'sim') {
+    localStorage.removeItem(VARIAVEL_EXCLUIR);
+    renderToast('Registro excluído com sucesso!');
+  }
+}
+
+function modal_excluir(event) {
+  event.preventDefault();
+  let pagina = document.getElementById('modal_pagina').value;
+  let uuid = document.getElementById('modal_uuid').value;
+
+  if ( (stringEhValida(pagina)) && (uuidEhValido(uuid)) ) {
+    openLoading();
+    excluir(
+      createURL(pagina),
+      uuid,
+      ()=>{
+        localStorage.setItem(VARIAVEL_EXCLUIR, 'sim');
+        header_botao_voltar();
+      },
+      (erro)=>{
+        console.error(erro);
+        renderErrorToast('Ocorreu um erro ao excluir o registro!');
+      },
+    );
+  } else {
+    renderErrorToast('Ocorreu um erro ao excluir o registro!');
+  }
+}
+
+function renderModalExcluir(pagina,uuid) {
+  document.getElementById('modal_pagina').value = pagina;
+  document.getElementById('modal_uuid').value = uuid;
+  mostrar_elemento('modal');
+}
+
+function campanhas_excluir_botao(event) {
+  event.preventDefault();
+  let uuid = document.getElementById('campanhas_editar_uuid').value;
+  renderModalExcluir('campanhas.php',uuid);
 }
 
 function definirListeners() {
+  /* Modal */
+  document.getElementById('modal_fechar').addEventListener('click',modal_fechar);
+  document.getElementById('modal_cancelar').addEventListener('click',modal_fechar);
+  document.getElementById('modal_excluir').addEventListener('click',modal_excluir);
+
   /* Tela */
   document.getElementById('texto-botao-mostrar').addEventListener('click',texto_botao_mostrar_listener);
   document.getElementById('texto-botao-esconder').addEventListener('click',texto_botao_esconder_listener);
@@ -1501,6 +1598,7 @@ function definirListeners() {
   document.getElementById('personagens_listar_inserir').addEventListener('click',personagens_novo_abrir_listener);
   document.getElementById('personagens_novo_cancelar').addEventListener('click',personagens_novo_cancelar_listener);
   document.getElementById('personagens_novo_salvar').addEventListener('click',personagens_novo_salvar_listener);
+  document.getElementById('campanhas_excluir_botao').addEventListener('click',campanhas_excluir_botao);
 
   /* Personagens */
   document.getElementById('personagens_editar_atualizar').addEventListener('click',atualizar_pagina_atual);
@@ -1557,6 +1655,9 @@ function esconder_todos() {
   esconder_elemento('campanhas_nova');
   esconder_elemento('campanhas_listar');
 
+  esconder_elemento('campanhas_excluir');
+  esconder_elemento('campanhas_excluir_form');
+
   esconder_elemento('personagens_editar');
   esconder_elemento('personagens_editar_salvar');
   esconder_elemento('personagens_editar_form');
@@ -1611,16 +1712,16 @@ function obterUrlRouter(callback) {
       'url',
       pagina.url,
       (json)=>{
-        callback(json);
+        callback(true,json);
       },
       (erro)=>{
         console.error(erro);
-        renderErrorToast('Ocorreu um erro ao obter os dados!');
-        callback(pagina);
+        router('erro','Sorry, mas seu registro não foi encontrado :(');
+        callback(false,pagina);
       },
     );
   } else {
-    callback(pagina);
+    callback(true,pagina);
   }
 }
 
@@ -1720,15 +1821,21 @@ function iniciar() {
   openLoading();
   definirListeners();
 
-  obterUrlRouter((pagina)=>{
+  obterUrlRouter((valido,pagina)=>{
     /* Router */
 
-    if (!pagina.possui_url) {
-      listarCampanhas();
-    } else if (pagina.eh_narrador_campanha || pagina.eh_jogador_campanha || pagina.eh_visualizador_campanha) {
-      editarCampanhas(pagina);
-    } else if (pagina.eh_narrador_personagem || pagina.eh_jogador_personagem || pagina.eh_visualizador_personagem) {
-      editarPersonagens(pagina);
+    if (valido) {
+      if (!pagina.possui_url) {
+        listarCampanhas();
+      } else if (pagina.eh_narrador_campanha || pagina.eh_jogador_campanha || pagina.eh_visualizador_campanha) {
+        editarCampanhas(pagina);
+      } else if (pagina.eh_narrador_personagem || pagina.eh_jogador_personagem || pagina.eh_visualizador_personagem) {
+        editarPersonagens(pagina);
+      }
+
+      verificar_excluido();
+    } else {
+      closeLoading();
     }
 
     /* Router */
