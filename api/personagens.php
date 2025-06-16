@@ -138,10 +138,6 @@
 
         } else if ($_SERVER["REQUEST_METHOD"] === "DELETE") {
 
-          header("HTTP/1.1 405");
-          die();
-
-          /*
           if (
               !array_key_exists("uuid",$_GET)
           ) {
@@ -153,7 +149,6 @@
               header("HTTP/1.1 200");
               die();
           }
-          */
 
         } else {
             header("HTTP/1.1 405");

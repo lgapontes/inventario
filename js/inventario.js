@@ -1056,6 +1056,8 @@ function render_personagens_editar_permissoes(json) {
     }
     mostrar_elemento('personagens_editar_alterar_campanhas');
     mostrar_elemento('personagens_editar_form_alterar_campanhas');
+    mostrar_elemento('personagens_excluir');
+    mostrar_elemento('personagens_excluir_form');
   } else if (itsTrue(json.eh_jogador)) {
     mostrar_elemento('personagens_editar_salvar');
     enableInput('personagens_editar_nome');
@@ -1066,12 +1068,16 @@ function render_personagens_editar_permissoes(json) {
       mostrar_elemento('personagens_editar_enviar_moedas');
       mostrar_elemento('personagens_editar_form_enviar_moedas');
     }
+    mostrar_elemento('personagens_excluir');
+    mostrar_elemento('personagens_excluir_form');
   } else {
     esconder_elemento('personagens_editar_salvar');
     disableInput('personagens_editar_nome');
     disableInput('personagens_editar_jogador');
     disableInput('personagens_editar_peso_maximo');
     esconder_elemento('personagens_editar_permissao');
+    esconder_elemento('personagens_excluir');
+    esconder_elemento('personagens_excluir_form');
   }
 }
 
@@ -1597,6 +1603,12 @@ function campanhas_excluir_botao(event) {
   renderModalExcluir('campanhas.php',uuid,'Campanha excluída com sucesso!');
 }
 
+function personagens_excluir_botao(event) {
+  event.preventDefault();
+  let uuid = document.getElementById('personagens_editar_uuid').value;
+  renderModalExcluir('personagens.php',uuid,'Personagem excluído com sucesso!');
+}
+
 function definirListeners() {
   /* Modal */
   document.getElementById('modal_fechar').addEventListener('click',modal_fechar);
@@ -1631,6 +1643,7 @@ function definirListeners() {
   document.getElementById('personagens_editar_url_visualizador_botao').addEventListener('click',personagens_editar_url_visualizador_botao);
   document.getElementById('personagens_editar_enviar_moedas_button').addEventListener('click',personagens_editar_enviar_moedas_button);
   document.getElementById('personagens_editar_alterar_campanhas_button').addEventListener('click',personagens_editar_alterar_campanhas_button);
+  document.getElementById('personagens_excluir_botao').addEventListener('click',personagens_excluir_botao);
 }
 
 /******************************************************************************/
@@ -1706,6 +1719,9 @@ function esconder_todos() {
 
   esconder_elemento('personagens_editar_alterar_campanhas');
   esconder_elemento('personagens_editar_form_alterar_campanhas');
+
+  esconder_elemento('personagens_excluir');
+  esconder_elemento('personagens_excluir_form');
 }
 
 function router(rota,mensagem) {

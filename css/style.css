@@ -1250,6 +1250,14 @@ div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:hov
   display: none;
 }
 
+#personagens_excluir {
+  display: none;
+}
+
+#personagens_excluir_form {
+  display: none;
+}
+
 /* Configurações por IDs */
 
 @media (min-width: 800px) {

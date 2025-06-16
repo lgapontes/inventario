@@ -11,7 +11,7 @@
         ini_set('display_errors', '1');
         ini_set('display_startup_errors', '1');
         error_reporting(E_ALL);
-    }    
+    }
 
     function conectar() {
         $LOCAWEB = false;
@@ -594,8 +594,6 @@
     }
 
     function excluirCampanha($conexao,$uuid) {
-        $query = 'delete from campanhas where uuid = ?';
-
         $query = <<<QUERY
           update campanhas set
             data_exclusao = now()
@@ -783,7 +781,10 @@
         from personagens
         inner join medidas on medidas.uuid = personagens.uuid_medida_peso_maximo
         inner join campanhas on campanhas.uuid = personagens.uuid_campanha
-        where campanhas.$qual_url = ?
+        where
+          personagens.data_exclusao is null and
+          campanhas.data_exclusao is null and
+          campanhas.$qual_url = ?
         order by personagens.nome, personagens.jogador
         QUERY;
 
@@ -819,7 +820,11 @@
             medidas.sigla
         from personagens
         inner join medidas on medidas.uuid = personagens.uuid_medida_peso_maximo
-        where personagens.uuid_campanha = ?
+        inner join campanhas on campanhas.uuid = personagens.uuid_campanha
+        where
+          personagens.data_exclusao is null and
+          campanhas.data_exclusao is null and
+          personagens.uuid_campanha = ?
         QUERY;
 
         $resultado = $conexao->execute_query($query, [$uuid]);
@@ -921,11 +926,13 @@
         inner join medidas on medidas.uuid = personagens.uuid_medida_peso_maximo
         inner join campanhas on campanhas.uuid = personagens.uuid_campanha
         where
-        	(
+        	personagens.data_exclusao is null and
+          campanhas.data_exclusao is null and
+          (
         	    personagens.url_narrador = ? or
-                personagens.url_jogador = ? or
-                personagens.url_visualizador = ?
-            )
+              personagens.url_jogador = ? or
+              personagens.url_visualizador = ?
+          )
         QUERY;
 
         $resultado = $conexao->execute_query($query, [$url,$url,$url,$url,$url,$url,$url,$url,$url]);
@@ -1035,24 +1042,12 @@
         }
     }
 
-    function obterPersonagem2($conexao,$uuid) {
-        $registros = array();
-
-        $query = 'select * from personagens where uuid = ?';
-
-        $resultado = $conexao->execute_query($query, [$uuid]);
-
-        if ($resultado->num_rows > 0) {
-            while($registro = $resultado->fetch_assoc()) {
-                array_push($registros,$registro);
-            }
-        }
-
-        return $registros;
-    }
-
     function excluirPersonagem($conexao,$uuid) {
-        $query = 'delete from personagens where uuid = ?';
+        $query = <<<QUERY
+          update personagens set
+            data_exclusao = now()
+          where uuid = ?
+        QUERY;
 
         $resultado = $conexao->execute_query($query,[$uuid]);
 
@@ -1060,17 +1055,6 @@
             throw new Exception("Erro no banco de dados: " . $conexao->error);
         }
     }
-
-    /*
-    $conexao = conectar();
-    $registro = array();
-    $registro["uuid_campanha"] = 'df901cea-04cf-40f1-900c-bf32d6689e78';
-    $registro["nome"] = 'Hazar';
-    $registro["jogador"] = 'Vicenzo';
-    $registro["peso_maximo"] = '20';
-    $registro["uuid_medida_peso_maximo"] = '542fc103-6cbd-4ecc-b457-2959dd0ffe7f';
-    inserirPersonagem($conexao,$registro);
-    */
 
     /* Itens */
 
