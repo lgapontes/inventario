@@ -11,7 +11,7 @@
         ini_set('display_errors', '1');
         ini_set('display_startup_errors', '1');
         error_reporting(E_ALL);
-    }
+    }    
 
     function conectar() {
         $LOCAWEB = false;
@@ -81,7 +81,7 @@
             IFNULL((select TRUE from personagens
             inner join campanhas on campanhas.uuid = personagens.uuid_campanha
             where
-            personagens.url_jogador = ? and 
+            personagens.url_jogador = ? and
             campanhas.data_exclusao is null
             ),FALSE) as eh_jogador_personagem,
 
@@ -465,15 +465,21 @@
         return $registro['url_narrador'];
     }
 
-    function obterCampanhas($conexao) {
+    function obterCampanhas($conexao,$admin) {
         $registros = array();
+
+        $qual_url = 'url_visualizador';
+        if ($admin) {
+          $qual_url = 'url_narrador';
+        }
 
         $query = <<<QUERY
           select
             campanhas.uuid as uuid,
             campanhas.nome as nome,
             campanhas.narrador as narrador,
-            campanhas.url_visualizador as url_visualizador,
+            campanhas.$qual_url as url,
+            '$qual_url' as qual_url,
             DATE_FORMAT(campanhas.data_cadastro, '%d/%m/%Y %H:%i:%s') as cadastro,
             sistemas.uuid as uuid_sistema,
             sistemas.nome as sistema
@@ -602,28 +608,6 @@
             throw new Exception("Erro no banco de dados: " . $conexao->error);
         }
     }
-
-    /*
-    $conexao = conectar();
-    $registro = array();
-    $registro["nome"] = 'Campanha AD&D 2ed de Cormyr';
-    $registro["narrador"] = 'SirLockee';
-    $registro["controlar_peso"] = intval(true);
-    $registro["uuid_medida_padrao"] = '542fc103-6cbd-4ecc-b457-2959dd0ffe7f';
-    inserirCampanha($conexao,$registro);
-
-    $conexao = conectar();
-    $registro = array();
-    $registro["uuid"] = 'df901cea-04cf-40f1-900c-bf32d6689e78';
-    $registro["nome"] = 'Campanha AD&D 2ed de Cormyr';
-    $registro["narrador"] = 'SirLockee';
-    $registro["controlar_peso"] = intval(true);
-    $registro["uuid_medida_padrao"] = '542fc103-6cbd-4ecc-b457-2959dd0ffe7f';
-    alterarCampanha($conexao,$registro);
-
-    $conexao = conectar();
-    obterCampanhas($conexao);
-    */
 
     /* Personagem */
 

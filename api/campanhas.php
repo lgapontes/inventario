@@ -1,6 +1,7 @@
 <?php
 
     include("services.php");
+    $ADMIN_UUID = parse_ini_file("admin.ini")['admin_uuid'];
 
     try {
 
@@ -97,10 +98,19 @@
 
         } else if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
+            $admin = false;
+            if (
+                array_key_exists("admin",$_GET)
+            ) {
+              if ($ADMIN_UUID == $_GET['admin']) {
+                $admin = true;
+              }
+            }
+
             if (
                 !array_key_exists("url",$_GET)
             ) {
-                $json = obterCampanhas($conexao);
+                $json = obterCampanhas($conexao,$admin);
                 header('Content-Type: application/json');
                 echo json_encode($json, JSON_UNESCAPED_UNICODE);
                 die();

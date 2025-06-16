@@ -6,6 +6,7 @@ const URL_REMOTA = 'https://www.flechamagica.com.br/aded2';
 const URL_LOCAL = 'http://localhost';
 const LOCALHOST = true;
 const VARIAVEL_MENSAGEM = 'registro-mensagem';
+const BOTAO_VOLTAR = 'header-botao-voltar';
 
 function createURL(path) {
   return `${(LOCALHOST ? URL_LOCAL : URL_REMOTA)}/api/${path}`;
@@ -25,6 +26,7 @@ function openJustLoading() {
 
 function closeLoading() {
   esconder_shimmer();
+  renderBotaoSalvar();
   document.getElementById('loading').style.display = 'none';
 }
 
@@ -111,26 +113,51 @@ function stringEhValida(s) {
   return false;
 }
 
-function salvarUrl(url) {
-  if (uuidEhValido(url)) {
-    localStorage.setItem('url', url);
-    return true;
-  } else {
-    limparUrl();
-    return false;
+function removerValorBotaoSalvar() {
+  let valor_botao_salvar = obterValorBotaoSalvar();
+  if (valor_botao_salvar.lista.length > 0) {
+    valor_botao_salvar.lista.pop();
   }
+  let lista_string = JSON.stringify(valor_botao_salvar.lista);
+  localStorage.setItem(BOTAO_VOLTAR,lista_string);
 }
 
-function limparUrl() {
-  localStorage.removeItem('url');
+function adicionarValorBotaoSalvar(href) {
+  let valor_botao_salvar = obterValorBotaoSalvar();
+  valor_botao_salvar.lista.push(href);
+  let lista_string = JSON.stringify(valor_botao_salvar.lista);
+  localStorage.setItem(BOTAO_VOLTAR,lista_string);
 }
 
-function obterUrlStorage() {
-  let url = localStorage.getItem('url');
-  if (url !== null) {
-    return {valido: true, valor: url};
+function adicionarValorAtualBotaoSalvar() {
+  adicionarValorBotaoSalvar(window.location.href);
+}
+
+function obterValorBotaoSalvar() {
+  let retorno = {
+    possui_href: false,
+    href: `${window.location.origin}${window.location.pathname}`,
+    lista: []
+  };
+
+  let lista_string = localStorage.getItem(BOTAO_VOLTAR);
+  if (lista_string !== null) {
+    retorno.lista = JSON.parse(lista_string);
+    if (retorno.lista.length > 0) {
+      retorno.possui_href = true;
+      retorno.href = retorno.lista[(retorno.lista.length - 1)];
+    }
+  }
+
+  return retorno;
+}
+
+function renderBotaoSalvar() {
+  let valor_botao_salvar = obterValorBotaoSalvar();
+  if (valor_botao_salvar.possui_href) {
+    mostrar_elemento('header-botao-voltar');
   } else {
-    return {valido: false, valor: null};
+    esconder_elemento('header-botao-voltar');
   }
 }
 
@@ -656,7 +683,7 @@ function renderBloco(textLabel,inputType,inputDisabled,inputValue,blocoMenor,blo
   return bloco;
 }
 
-function renderLinhaCampanha(nome,narrador,criacao,url_visualizador,sistema) {
+function renderLinhaCampanha(nome,narrador,criacao,url,sistema) {
   let linha = document.createElement('div');
   linha.classList.add('linha');
   linha.classList.add('linha-link');
@@ -665,7 +692,7 @@ function renderLinhaCampanha(nome,narrador,criacao,url_visualizador,sistema) {
   linha.appendChild(renderBloco('Narrador','text',true,narrador,true,false));
   linha.appendChild(renderBloco('Criação','text',true,criacao,true,true));
   linha.addEventListener('click',(event)=>{
-    exibir_registro_via_url(event,url_visualizador);
+    exibir_registro_via_url(event,url);
   });
   return linha;
 }
@@ -690,7 +717,7 @@ function renderCampanhas(lista,sistemas,callback) {
             entry.nome,
             entry.narrador,
             entry.cadastro,
-            entry.url_visualizador,
+            entry.url,
             entry.sistema
           );
           linhas.appendChild(linha);
@@ -787,9 +814,6 @@ function renderLista(id,lista,campoChaveLista,campoTextoLista,selecionados,campo
 }
 
 function render_campanhas_editar_permissoes(json) {
-  /* URL do Voltar */
-  document.getElementById('header-botao-voltar-url').value = window.location.pathname;
-
   if (itsTrue(json.campanha.eh_narrador)) {
     mostrar_elemento('campanhas_editar_salvar');
     enableInput('campanhas_editar_nome');
@@ -1014,9 +1038,6 @@ function render_personagens_editar_permissoes_pode_enviar_moedas(json) {
 }
 
 function render_personagens_editar_permissoes(json) {
-  /* URL do Voltar */
-  document.getElementById('header-botao-voltar-url').value = render_alterar_link_gerar_url(json.url_campanha);
-
   if (json.permissoes.controlar_peso) {
     document.getElementById('personagens_editar_controlar_peso').style.display = 'block';
   } else {
@@ -1113,7 +1134,9 @@ function render_personagens_editar(json,callback) {
 
 function exibir_registro_via_url(event,url) {
   event.preventDefault();
-  window.location.href = render_alterar_link_gerar_url(url);
+  adicionarValorAtualBotaoSalvar();
+  let href = render_alterar_link_gerar_url(url);
+  window.location.href = href;
 }
 
 function atualizar_pagina_atual(event) {
@@ -1207,8 +1230,9 @@ function texto_botao_esconder_listener(event) {
 }
 
 function header_botao_voltar() {
-  let url = document.getElementById('header-botao-voltar-url').value;
-  window.location.href = url;
+  let valor_botao_salvar = obterValorBotaoSalvar();
+  removerValorBotaoSalvar();
+  window.location.href = valor_botao_salvar.href;
 }
 
 function header_botao_voltar_listener(event) {
@@ -1614,9 +1638,22 @@ function definirListeners() {
 /******************************************************************************/
 
 function obterUrl() {
+  let href = window.location.href;
   let url_pagina = new URLSearchParams(window.location.search);
+
   let url = url_pagina.get('url');
-  let possui_url = salvarUrl(url);
+  let possui_url = false;
+  if (uuidEhValido(url)) {
+    possui_url = true;
+  }
+
+  let admin = url_pagina.get('admin');
+  let eh_admin = false;
+  if (uuidEhValido(admin)) {
+    eh_admin = true;
+  } else {
+    admin = '';
+  }
 
   return {
     url: url,
@@ -1626,7 +1663,9 @@ function obterUrl() {
     eh_visualizador_campanha:true,
     eh_narrador_personagem:false,
     eh_jogador_personagem:false,
-    eh_visualizador_personagem:false
+    eh_visualizador_personagem:false,
+    admin: admin,
+    eh_admin: eh_admin,
   };
 }
 
@@ -1684,14 +1723,12 @@ function router(rota,mensagem) {
     mostrar_elemento('campanhas_editar_form');
     mostrar_elemento('personagens_listar_titulo');
     mostrar_elemento('personagens_listar');
-    mostrar_elemento('header-botao-voltar');
   } else if (rota === 'campanhas_listar') {
     mostrar_elemento('campanhas_titulo');
     mostrar_elemento('campanhas_listar');
   } else if (rota === 'personagens_editar') {
     mostrar_elemento('personagens_editar');
     mostrar_elemento('personagens_editar_form');
-    mostrar_elemento('header-botao-voltar');
   }
 
   esconder_shimmer();
@@ -1723,29 +1760,16 @@ function obterUrlRouter(callback) {
   }
 }
 
-function listarCampanhas() {
+function listarCampanhasSistemas(json) {
   listar(
-    createURL('campanhas.php'),
-    (json)=>{
-
-      listar(
-        createURL('sistemas.php'),
-        (sistemas)=>{
-          /* Listar campanhas */
-          router('campanhas_listar');
-          renderCampanhas(json,sistemas,()=>{
-            closeLoading();
-          });
-          /* Listar campanhas */
-        },
-        (erro)=>{
-          router('campanhas_listar');
-          console.error(erro);
-          closeLoading();
-          renderErrorToast('Ocorreu um erro ao obter os dados!');
-        },
-      );
-
+    createURL('sistemas.php'),
+    (sistemas)=>{
+      /* Listar campanhas */
+      router('campanhas_listar');
+      renderCampanhas(json,sistemas,()=>{
+        closeLoading();
+      });
+      /* Listar campanhas */
     },
     (erro)=>{
       router('campanhas_listar');
@@ -1754,6 +1778,42 @@ function listarCampanhas() {
       renderErrorToast('Ocorreu um erro ao obter os dados!');
     },
   );
+}
+
+function listarCampanhas(pagina) {
+  if (pagina.eh_admin) {
+    // Listar com parâmetros
+    obter_com_parametro(
+      createURL('campanhas.php'),
+      'admin',
+      pagina.admin,
+      (json)=>{
+        listarCampanhasSistemas(json);
+      },
+      (erro)=>{
+        router('campanhas_listar');
+        console.error(erro);
+        closeLoading();
+        renderErrorToast('Ocorreu um erro ao obter os dados!');
+      },
+    );
+    // Listar com parâmetros
+  } else {
+    // Listar sem parâmetros
+    listar(
+      createURL('campanhas.php'),
+      (json)=>{
+        listarCampanhasSistemas(json);
+      },
+      (erro)=>{
+        router('campanhas_listar');
+        console.error(erro);
+        closeLoading();
+        renderErrorToast('Ocorreu um erro ao obter os dados!');
+      },
+    );
+    // Listar sem parâmetros
+  }
 }
 
 function editarCampanhas(pagina) {
@@ -1824,7 +1884,7 @@ function iniciar() {
 
     if (valido) {
       if (!pagina.possui_url) {
-        listarCampanhas();
+        listarCampanhas(pagina);
       } else if (pagina.eh_narrador_campanha || pagina.eh_jogador_campanha || pagina.eh_visualizador_campanha) {
         editarCampanhas(pagina);
       } else if (pagina.eh_narrador_personagem || pagina.eh_jogador_personagem || pagina.eh_visualizador_personagem) {
