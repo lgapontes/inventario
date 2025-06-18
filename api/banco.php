@@ -1127,6 +1127,73 @@
         return obterItem($conexao,$registro['uuid']);
     }
 
+    function obterItensPorPersonagem($conexao,$url_personagem) {
+        $registros = array();
+
+        //$query = "select *, CASE WHEN data_exclusao is null THEN false ELSE true END as excluido from itens";
+
+        $query = <<<QUERY
+          select
+            itens.uuid,
+            itens.uuid_personagem,
+            itens.descricao,
+            itens.quantidade,
+            itens.peso_unitario,
+            itens.uuid_medida_peso_unitario,
+            medidas.medida,
+            medidas.sigla,
+            DATE_FORMAT(itens.data_cadastro, '%d/%m/%Y %H:%i:%s') as data_cadastro,
+            CASE WHEN personagens.url_narrador = ?
+            THEN true ELSE false END as eh_narrador,
+            CASE WHEN personagens.url_jogador = ?
+            THEN true ELSE false END as eh_jogador,
+            CASE WHEN personagens.url_visualizador = ?
+            THEN true ELSE false END as eh_visualizador,
+            (
+              select
+              CONCAT(DATE_FORMAT(max(inner1.data_alteracao), '%d/%m/%Y %H:%i:%s'),CONCAT(': ',inner1.alteracao))
+              from itens_alteracoes as inner1
+              where inner1.uuid_item = itens.uuid
+              group by inner1.alteracao
+              order by 1 desc limit 1
+            ) as alteracao
+          from itens
+          inner join medidas on medidas.uuid = itens.uuid_medida_peso_unitario
+          inner join personagens on personagens.uuid = itens.uuid_personagem
+          where
+            itens.data_exclusao is null and
+            (
+                personagens.url_narrador = ? or
+                personagens.url_jogador = ? or
+                personagens.url_visualizador = ?
+            )
+        QUERY;
+
+        $resultado = $conexao->execute_query($query,[
+            $url_personagem,
+            $url_personagem,
+            $url_personagem,
+            $url_personagem,
+            $url_personagem,
+            $url_personagem
+        ]);
+        if (!$resultado) {
+            throw new Exception("Erro no banco de dados: " . $conexao->error);
+        }
+
+        if ($resultado->num_rows > 0) {
+            while($registro = $resultado->fetch_assoc()) {
+                $registro = converterBoolean($registro,'eh_narrador');
+                $registro = converterBoolean($registro,'eh_jogador');
+                $registro = converterBoolean($registro,'eh_visualizador');
+                $registro["peso_unitario"] = str_replace(".",",",$registro["peso_unitario"]);
+                array_push($registros,$registro);
+            }
+        }
+
+        return $registros;
+    }
+
     function obterItens($conexao) {
         $registros = array();
 

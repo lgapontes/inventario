@@ -869,6 +869,18 @@ function renderLinhaVazia(mensagem) {
   return linha;
 }
 
+function renderLinhaVaziaItens(mensagem) {
+  let bloco = document.createElement('div');
+  bloco.classList.add('bloco');
+
+  let label = document.createElement('label');
+  label.classList.add('sem-registros');
+  label.innerHTML = mensagem;
+
+  bloco.appendChild(label);
+  return bloco;
+}
+
 function listarPersonagens(callback) {
   let listas = document.getElementById('personagens_listar');
   listas.innerHTML = '';
@@ -1058,6 +1070,7 @@ function render_personagens_editar_permissoes(json) {
     mostrar_elemento('personagens_editar_form_alterar_campanhas');
     mostrar_elemento('personagens_excluir');
     mostrar_elemento('personagens_excluir_form');
+    mostrar_elemento('itens_listar_inserir');
   } else if (itsTrue(json.eh_jogador)) {
     mostrar_elemento('personagens_editar_salvar');
     enableInput('personagens_editar_nome');
@@ -1070,6 +1083,7 @@ function render_personagens_editar_permissoes(json) {
     }
     mostrar_elemento('personagens_excluir');
     mostrar_elemento('personagens_excluir_form');
+    mostrar_elemento('itens_listar_inserir');
   } else {
     esconder_elemento('personagens_editar_salvar');
     disableInput('personagens_editar_nome');
@@ -1078,7 +1092,236 @@ function render_personagens_editar_permissoes(json) {
     esconder_elemento('personagens_editar_permissao');
     esconder_elemento('personagens_excluir');
     esconder_elemento('personagens_excluir_form');
+    esconder_elemento('itens_listar_inserir');
   }
+}
+
+function renderLinhaItem(select_medidas,item) {
+  let linha = document.createElement('div');
+  linha.classList.add('bloco');
+  linha.classList.add('bloco-item');
+
+  /* Descrição */
+  let bloco_input_item = document.createElement('div');
+  bloco_input_item.classList.add('bloco');
+  bloco_input_item.classList.add('item');
+  bloco_input_item.classList.add('borda');
+
+  let input_item_id = `item_${item.uuid}`;
+
+  let label_item = document.createElement('label');
+  label_item.setAttribute('for',input_item_id);
+  label_item.innerHTML = 'Item';
+
+  let input_item = document.createElement('input');
+  input_item.setAttribute('type','text');
+  input_item.value = item.descricao;
+  input_item.id = input_item_id;
+  input_item.setAttribute('name',input_item_id);
+  input_item.setAttribute('disabled','disabled');
+  input_item.setAttribute('readonly','readonly');
+
+  bloco_input_item.appendChild(label_item);
+  bloco_input_item.appendChild(input_item);
+  /* Descrição */
+
+  linha.appendChild(bloco_input_item);
+
+  let bloco_outros = document.createElement('div');
+  bloco_outros.classList.add('bloco');
+  bloco_outros.classList.add('item');
+  bloco_outros.classList.add('borda');
+
+  /* Quantidade */
+  let input_quantidade_id = `quantidade_${item.uuid}`;
+
+  let label_quantidade = document.createElement('label');
+  label_quantidade.setAttribute('for',input_quantidade_id);
+  label_quantidade.classList.add('small-caps');
+  label_quantidade.innerHTML = 'qtde';
+
+  let input_quantidade = document.createElement('input');
+  input_quantidade.setAttribute('type','number');
+  input_quantidade.value = item.quantidade;
+  input_quantidade.setAttribute('min', '0');
+  input_quantidade.id = input_quantidade_id;
+  input_quantidade.setAttribute('name',input_quantidade_id);
+  input_quantidade.setAttribute('disabled','disabled');
+  input_quantidade.setAttribute('readonly','readonly');
+
+  bloco_outros.appendChild(label_quantidade);
+  bloco_outros.appendChild(input_quantidade);
+
+  let button_quantidade = document.createElement('button');
+  button_quantidade.setAttribute('type','button');
+  button_quantidade.classList.add('usar');
+
+  let button_quantidade_img = document.createElement('img');
+  button_quantidade_img.src = 'img/file-circle-minus-solid.svg';
+  button_quantidade.appendChild(button_quantidade_img);
+
+  let button_quantidade_span = document.createElement('span');
+  button_quantidade_span.innerHTML = 'Usar';
+  button_quantidade.appendChild(button_quantidade_span);
+
+  bloco_outros.appendChild(button_quantidade);
+  /* Quantidade */
+
+  /* Peso */
+  let input_peso_id = `peso_${item.uuid}`;
+
+  let label_peso = document.createElement('label');
+  label_peso.setAttribute('for',input_peso_id);
+  label_peso.classList.add('espaco');
+  label_peso.innerHTML = 'Peso';
+
+  let input_peso = document.createElement('input');
+  input_peso.setAttribute('type','text');
+  input_peso.classList.add('like-number');
+  input_peso.value = item.peso_unitario;
+  input_peso.id = input_peso_id;
+  input_peso.setAttribute('name',input_peso_id);
+  input_peso.setAttribute('disabled','disabled');
+  input_peso.setAttribute('readonly','readonly');
+
+  bloco_outros.appendChild(label_peso);
+  bloco_outros.appendChild(input_peso);
+
+  const select_medidas_clonado = select_medidas.cloneNode(true);
+  select_medidas_clonado.id = `medida_${item.uuid}`;
+  bloco_outros.appendChild(select_medidas_clonado);
+  /* Peso */
+
+  /* Botão Editar */
+  let button_editar = document.createElement('button');
+  button_editar.setAttribute('type','button');
+
+  let button_editar_img = document.createElement('img');
+  button_editar_img.src = 'img/pen-to-square-solid.svg';
+  button_editar.appendChild(button_editar_img);
+
+  let button_editar_span = document.createElement('span');
+  button_editar_span.innerHTML = 'Editar';
+  button_editar.appendChild(button_editar_span);
+
+  bloco_outros.appendChild(button_editar);
+  /* Botão Editar */
+
+  /* Botão Salvar */
+  let button_salvar = document.createElement('button');
+  button_salvar.setAttribute('type','button');
+  button_salvar.style.display = 'none';
+
+  let button_salvar_img = document.createElement('img');
+  button_salvar_img.src = 'img/floppy-disk-solid.svg';
+  button_salvar.appendChild(button_salvar_img);
+
+  let button_salvar_span = document.createElement('span');
+  button_salvar_span.innerHTML = 'Salvar';
+  button_salvar.appendChild(button_salvar_span);
+
+  bloco_outros.appendChild(button_salvar);
+  /* Botão Salvar */
+
+  /* Botão Log */
+  let button_log = document.createElement('button');
+  button_log.setAttribute('type','button');
+  button_log.classList.add('espaco');
+
+  let button_log_img = document.createElement('img');
+  button_log_img.src = 'img/file-lines-solid.svg';
+  button_log.appendChild(button_log_img);
+
+  let button_log_span = document.createElement('span');
+  button_log_span.innerHTML = 'Log';
+  button_log.appendChild(button_log_span);
+
+  bloco_outros.appendChild(button_log);
+  /* Botão Log */
+
+  linha.appendChild(bloco_outros);
+
+  /* Log */
+  let bloco_log = document.createElement('div');
+  bloco_log.classList.add('bloco');
+  bloco_log.classList.add('item');
+
+  let label_log = document.createElement('label');
+  label_log.classList.add('log');
+  label_log.innerHTML = item.alteracao;
+  bloco_log.appendChild(label_log);
+  /* Log */
+
+  linha.appendChild(bloco_log);
+
+  return linha;
+}
+
+function renderMedidasSelect(medidas,callback) {
+  let select = document.createElement('select');
+  select.setAttribute('disabled','disabled');
+  select.setAttribute('readonly','readonly');
+
+  medidas.forEach((medida, index) => {
+    let option = document.createElement('option');
+    option.value = medida.uuid;
+    option.innerHTML = medida.sigla;
+    select.appendChild(option);
+
+    if (index === (medidas.length - 1)) {
+      callback(select);
+    }
+  });
+}
+
+function listarItens(callback) {
+  let lista = document.getElementById('itens_listar_lista');
+  lista.innerHTML = '';
+  let url = document.getElementById('personagens_editar_url').value;
+
+  /* Personagens */
+  obter_com_parametro(
+    createURL('itens.php'),
+    'personagem',
+    url,
+    (json)=>{
+      if (json.itens.length == 0) {
+        let div = renderLinhaVaziaItens('Personagem sem itens');
+        lista.appendChild(div);
+        callback();
+      } else {
+
+        renderMedidasSelect(json.medidas,(select_medidas)=>{
+          json.itens.forEach((item, index) => {
+            let linha = renderLinhaItem(select_medidas,item);
+            lista.appendChild(linha);
+
+            if (index === (json.itens.length - 1)) {
+              callback();
+            }
+          });
+        });
+
+
+        /*
+        json.forEach((entry, index) => {
+          let div = renderLinhaPersonagem(entry);
+          lista.appendChild(div);
+
+          if (index === (json.length - 1)) {
+            callback();
+          }
+        });
+        */
+      }
+    },
+    (erro)=>{
+      console.error(erro);
+      renderErrorToast('Ocorreu um erro ao obter os dados!');
+      callback();
+    },
+  );
+  /* Personagens */
 }
 
 function render_personagens_editar(json,callback) {
@@ -1116,8 +1359,10 @@ function render_personagens_editar(json,callback) {
                   render_personagens_editar_campo(propriedade,valor,()=>{
                     if (index === (propriedades.length - 1)) {
                       renderListaMoedas(json,()=>{
-                        closeLoading();
-                        callback();
+                        listarItens(()=>{
+                          closeLoading();
+                          callback();
+                        });
                       });
                     }
                   });
@@ -1722,6 +1967,9 @@ function esconder_todos() {
 
   esconder_elemento('personagens_excluir');
   esconder_elemento('personagens_excluir_form');
+
+  esconder_elemento('itens_listar');
+  esconder_elemento('itens_listar_lista');
 }
 
 function router(rota,mensagem) {
@@ -1745,6 +1993,8 @@ function router(rota,mensagem) {
   } else if (rota === 'personagens_editar') {
     mostrar_elemento('personagens_editar');
     mostrar_elemento('personagens_editar_form');
+    mostrar_elemento('itens_listar');
+    mostrar_elemento('itens_listar_lista');
   }
 
   esconder_shimmer();

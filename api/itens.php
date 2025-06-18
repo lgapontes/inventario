@@ -84,6 +84,23 @@
 
         } else if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
+            if (
+                array_key_exists('personagem',$_GET)
+            ) {
+                $itens = obterItensPorPersonagem($conexao,$_GET['personagem']);
+                $retorno = array();
+                $retorno['itens'] = $itens;
+                $retorno['medidas'] = obterMedidas($conexao);
+
+                header('Content-Type: application/json');
+                echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
+                die();
+            } else {
+              header("HTTP/1.1 400");
+              die();
+            }
+
+            /*
             $json = null;
 
             if (
@@ -126,6 +143,7 @@
                 echo json_encode($json, JSON_UNESCAPED_UNICODE);
                 die();
             }
+            */
 
 
         } if ($_SERVER["REQUEST_METHOD"] === "DELETE") {

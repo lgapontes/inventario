@@ -20,3 +20,13 @@ alter table campanhas add column `uuid_sistema` char(36) CHARACTER SET utf8mb4 C
 alter table campanhas alter column `uuid_sistema` drop default;
 
 alter table personagens add column `data_exclusao` timestamp NULL DEFAULT NULL;
+
+ALTER TABLE itens DROP COLUMN data_alteracao;
+
+CREATE TABLE `itens_alteracoes` (
+  `uuid` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid_item` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data_alteracao` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `alteracao` varchar(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

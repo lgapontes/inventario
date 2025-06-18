@@ -1048,6 +1048,12 @@ div.inventario div.linha div.bloco > select {
   background-color: rgba(59, 39, 11, .1);
 }
 
+div.inventario div.linha div.bloco > select[disabled] {
+  background-color: #cccccc;
+  color: #666666;
+  opacity: 1;
+}
+
 div.inventario div.linha div.bloco > select > option {
   font-size: 1.1em;
   font-family: "Oregon-LDO", sans-serif;
@@ -1130,6 +1136,92 @@ div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:foc
 div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:hover {
   float: left;
   background-color: #ef764c;
+}
+
+div.inventario div.linha div.bloco-item {
+  border: 1.5px solid rgb(39, 29, 0);
+  background-color: rgba(59, 39, 11, .1);
+}
+
+div.inventario div.linha div.bloco-item > div.bloco {
+  margin-top: 0;
+}
+
+div.inventario div.linha div.bloco-item > div.borda {
+  border-bottom: 1px solid rgba(59, 39, 11, .7);
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > label {
+  width: 11%;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > label.small-caps {
+  font-variant: small-caps;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > label.espaco {
+  margin-left: 1%;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > label.log {
+  width: 100%;
+  font-style: italic;
+  background-color: rgba(0,0,0,0);
+  line-height: 20px;
+  margin-top: 5px;
+  margin-bottom: 3px;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > select {
+  width: 15%;
+  border-right: 1px solid rgba(59, 39, 11, .7);
+  text-align: center;
+  text-indent: 0;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > input[type=text] {
+  width: 89%;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > input[type=number] {
+  width: 15%;
+  border-right: 1px solid rgba(59, 39, 11, .7);
+  text-align: center;
+  text-indent: 0;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > input[type=text].like-number {
+  width: 15%;
+  border-right: 1px solid rgba(59, 39, 11, .7);
+  text-align: center;
+  text-indent: 0;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button] {
+  padding: 2px 0 2px 0;
+  height: 26px;
+  width: 10%;
+  text-align: center;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button].espaco {
+  margin-right: 0.5%;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button].usar {
+  float: left;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button] > img {
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+  margin: 2px 0 0 0;
+  float: none;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button] > span {
+  display: none;
 }
 
 /* Inventário - render */
@@ -1258,6 +1350,18 @@ div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:hov
   display: none;
 }
 
+#itens_listar {
+  display: none;
+}
+
+#itens_listar_lista {
+  display: none;
+}
+
+#itens_listar_inserir {
+  display: none;
+}
+
 /* Configurações por IDs */
 
 @media (min-width: 800px) {
@@ -1369,6 +1473,42 @@ div.inventario > div.linha > div.bloco-botoes > button[type=button].cancelar:hov
 
   div.inventario div.linha div.bloco-checkbox > label {
     width: 90%;
+  }
+
+  /* Itens */
+
+  div.inventario div.linha div.bloco-item > div.bloco > label.espaco {
+    margin-left: 5%;
+  }
+
+  div.inventario div.linha div.bloco-item > div.bloco > input[type=number] {
+    width: 10%;
+  }
+
+  div.inventario div.linha div.bloco-item > div.bloco > input[type=text].like-number {
+    width: 15%;
+  }
+
+  div.inventario div.linha div.bloco-item > div.bloco > button[type=button] {
+    padding: 2px 8px 2px 8px;
+    height: 26px;
+    width: auto;
+  }
+
+  div.inventario div.linha div.bloco-item > div.bloco > button[type=button] > img {
+    width: 17px;
+    height: 17px;
+    display: block;
+    float: left;
+    margin: 0 5px 0 0;
+  }
+
+  div.inventario div.linha div.bloco-item > div.bloco > button[type=button] > span {
+    display: block;
+    float: right;
+    margin: 0 3px 0 2px;
+    font-size: 1em;
+    color: #ffffff;
   }
 }
 
