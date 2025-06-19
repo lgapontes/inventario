@@ -1096,7 +1096,67 @@ function render_personagens_editar_permissoes(json) {
   }
 }
 
-function renderLinhaItem(select_medidas,item) {
+function renderLinhaItem_botao(bloco,classe,src,innerHTML,esconder,evento) {
+  let button = document.createElement('button');
+  button.setAttribute('type','button');
+  if (esconder) {
+    button.style.display = 'none';
+  }
+
+  if ( (classe) && (classe != '') ) {
+    button.classList.add(classe);
+  }
+
+  let button_img = document.createElement('img');
+  button_img.src = src;
+  button.appendChild(button_img);
+
+  let button_span = document.createElement('span');
+  button_span.innerHTML = innerHTML;
+  button.appendChild(button_span);
+
+  button.addEventListener('click',evento);
+  bloco.appendChild(button);
+}
+
+function renderLinhaItem_label(bloco,id,classe,innerHTML) {
+  let label = document.createElement('label');
+  label.setAttribute('for',id);
+
+  if ( (classe) && (classe != '') ) {
+    label.classList.add(classe);
+  }
+  label.innerHTML = innerHTML;
+
+  bloco.appendChild(label);
+}
+
+function renderLinhaItem_input(bloco,type,value,id,disabled,min,classe) {
+  let input = document.createElement('input');
+  input.setAttribute('type',type);
+
+  if (classe) {
+    input.classList.add(classe);
+  }
+
+  input.value = value;
+
+  if ( (min) && isValidInteger(min) ) {
+    input.setAttribute('min', min);
+  }
+
+  input.id = id;
+  input.setAttribute('name',id);
+
+  if (disabled) {
+    input.setAttribute('disabled','disabled');
+    input.setAttribute('readonly','readonly');
+  }
+
+  bloco.appendChild(input);
+}
+
+function renderLinhaItem(medidas,select_medidas,item) {
   let linha = document.createElement('div');
   linha.classList.add('bloco');
   linha.classList.add('bloco-item');
@@ -1109,10 +1169,23 @@ function renderLinhaItem(select_medidas,item) {
 
   let input_item_id = `item_${item.uuid}`;
 
-  let label_item = document.createElement('label');
-  label_item.setAttribute('for',input_item_id);
-  label_item.innerHTML = 'Item';
+  renderLinhaItem_label(
+    bloco_input_item,
+    input_item_id,
+    null,
+    'Item'
+  );
 
+  renderLinhaItem_input(
+    bloco_input_item,
+    'text',
+    item.descricao,
+    input_item_id,
+    true,
+    null,
+    null
+  );
+  /*
   let input_item = document.createElement('input');
   input_item.setAttribute('type','text');
   input_item.value = item.descricao;
@@ -1121,8 +1194,8 @@ function renderLinhaItem(select_medidas,item) {
   input_item.setAttribute('disabled','disabled');
   input_item.setAttribute('readonly','readonly');
 
-  bloco_input_item.appendChild(label_item);
   bloco_input_item.appendChild(input_item);
+  */
   /* Descrição */
 
   linha.appendChild(bloco_input_item);
@@ -1135,11 +1208,23 @@ function renderLinhaItem(select_medidas,item) {
   /* Quantidade */
   let input_quantidade_id = `quantidade_${item.uuid}`;
 
-  let label_quantidade = document.createElement('label');
-  label_quantidade.setAttribute('for',input_quantidade_id);
-  label_quantidade.classList.add('small-caps');
-  label_quantidade.innerHTML = 'qtde';
+  renderLinhaItem_label(
+    bloco_outros,
+    input_quantidade_id,
+    'small-caps',
+    'qtde'
+  );
 
+  renderLinhaItem_input(
+    bloco_outros,
+    'number',
+    item.quantidade,
+    input_quantidade_id,
+    true,
+    0,
+    null
+  );
+  /*
   let input_quantidade = document.createElement('input');
   input_quantidade.setAttribute('type','number');
   input_quantidade.value = item.quantidade;
@@ -1149,32 +1234,40 @@ function renderLinhaItem(select_medidas,item) {
   input_quantidade.setAttribute('disabled','disabled');
   input_quantidade.setAttribute('readonly','readonly');
 
-  bloco_outros.appendChild(label_quantidade);
   bloco_outros.appendChild(input_quantidade);
+  */
 
-  let button_quantidade = document.createElement('button');
-  button_quantidade.setAttribute('type','button');
-  button_quantidade.classList.add('usar');
-
-  let button_quantidade_img = document.createElement('img');
-  button_quantidade_img.src = 'img/file-circle-minus-solid.svg';
-  button_quantidade.appendChild(button_quantidade_img);
-
-  let button_quantidade_span = document.createElement('span');
-  button_quantidade_span.innerHTML = 'Usar';
-  button_quantidade.appendChild(button_quantidade_span);
-
-  bloco_outros.appendChild(button_quantidade);
+  /* Botão Quantidade */
+  renderLinhaItem_botao(
+    bloco_outros,
+    'usar',
+    'img/file-circle-minus-solid.svg',
+    'Usar',
+    false,
+    (event)=>{event.preventDefault();}
+  );
   /* Quantidade */
 
   /* Peso */
   let input_peso_id = `peso_${item.uuid}`;
 
-  let label_peso = document.createElement('label');
-  label_peso.setAttribute('for',input_peso_id);
-  label_peso.classList.add('espaco');
-  label_peso.innerHTML = 'Peso';
-
+  renderLinhaItem_label(
+    bloco_outros,
+    input_peso_id,
+    'espaco',
+    'Peso'
+  );
+  
+  renderLinhaItem_input(
+    bloco_outros,
+    'text',
+    item.peso_unitario,
+    input_peso_id,
+    true,
+    null,
+    'like-number'
+  );
+  /*
   let input_peso = document.createElement('input');
   input_peso.setAttribute('type','text');
   input_peso.classList.add('like-number');
@@ -1184,60 +1277,45 @@ function renderLinhaItem(select_medidas,item) {
   input_peso.setAttribute('disabled','disabled');
   input_peso.setAttribute('readonly','readonly');
 
-  bloco_outros.appendChild(label_peso);
   bloco_outros.appendChild(input_peso);
+  */
 
-  const select_medidas_clonado = select_medidas.cloneNode(true);
+  let select_medidas_clonado = select_medidas.cloneNode(true);
   select_medidas_clonado.id = `medida_${item.uuid}`;
+  let index_medida = medidas.findIndex(entry => entry.uuid === item.uuid_medida_peso_unitario);
+  select_medidas_clonado.selectedIndex = index_medida;
   bloco_outros.appendChild(select_medidas_clonado);
   /* Peso */
 
   /* Botão Editar */
-  let button_editar = document.createElement('button');
-  button_editar.setAttribute('type','button');
-
-  let button_editar_img = document.createElement('img');
-  button_editar_img.src = 'img/pen-to-square-solid.svg';
-  button_editar.appendChild(button_editar_img);
-
-  let button_editar_span = document.createElement('span');
-  button_editar_span.innerHTML = 'Editar';
-  button_editar.appendChild(button_editar_span);
-
-  bloco_outros.appendChild(button_editar);
-  /* Botão Editar */
+  renderLinhaItem_botao(
+    bloco_outros,
+    null,
+    'img/pen-to-square-solid.svg',
+    'Editar',
+    false,
+    (event)=>{event.preventDefault();}
+  );
 
   /* Botão Salvar */
-  let button_salvar = document.createElement('button');
-  button_salvar.setAttribute('type','button');
-  button_salvar.style.display = 'none';
-
-  let button_salvar_img = document.createElement('img');
-  button_salvar_img.src = 'img/floppy-disk-solid.svg';
-  button_salvar.appendChild(button_salvar_img);
-
-  let button_salvar_span = document.createElement('span');
-  button_salvar_span.innerHTML = 'Salvar';
-  button_salvar.appendChild(button_salvar_span);
-
-  bloco_outros.appendChild(button_salvar);
-  /* Botão Salvar */
+  renderLinhaItem_botao(
+    bloco_outros,
+    null,
+    'img/floppy-disk-solid.svg',
+    'Salvar',
+    true,
+    (event)=>{event.preventDefault();}
+  );
 
   /* Botão Log */
-  let button_log = document.createElement('button');
-  button_log.setAttribute('type','button');
-  button_log.classList.add('espaco');
-
-  let button_log_img = document.createElement('img');
-  button_log_img.src = 'img/file-lines-solid.svg';
-  button_log.appendChild(button_log_img);
-
-  let button_log_span = document.createElement('span');
-  button_log_span.innerHTML = 'Log';
-  button_log.appendChild(button_log_span);
-
-  bloco_outros.appendChild(button_log);
-  /* Botão Log */
+  renderLinhaItem_botao(
+    bloco_outros,
+    'espaco',
+    'img/file-lines-solid.svg',
+    'Log',
+    false,
+    (event)=>{event.preventDefault();}
+  );
 
   linha.appendChild(bloco_outros);
 
@@ -1265,7 +1343,7 @@ function renderMedidasSelect(medidas,callback) {
   medidas.forEach((medida, index) => {
     let option = document.createElement('option');
     option.value = medida.uuid;
-    option.innerHTML = medida.sigla;
+    option.innerHTML = medida.medida;
     select.appendChild(option);
 
     if (index === (medidas.length - 1)) {
@@ -1293,7 +1371,7 @@ function listarItens(callback) {
 
         renderMedidasSelect(json.medidas,(select_medidas)=>{
           json.itens.forEach((item, index) => {
-            let linha = renderLinhaItem(select_medidas,item);
+            let linha = renderLinhaItem(json.medidas,select_medidas,item);
             lista.appendChild(linha);
 
             if (index === (json.itens.length - 1)) {
