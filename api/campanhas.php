@@ -3,6 +3,27 @@
     include("services.php");
     $ADMIN_UUID = parse_ini_file("admin.ini")['admin_uuid'];
 
+    function checkBooleanFalse($objeto,$propriedade) {
+      if ( (is_null($objeto[$propriedade])) || ($objeto[$propriedade] == '') ) {
+        $objeto[$propriedade] = 0;
+      } else {
+        $objeto[$propriedade] = 1;
+      }
+      return $objeto;
+    }
+
+    function converterBooleansCampanha($campanha) {
+      $campanha = checkBooleanFalse($campanha,"controlar_peso");
+      $campanha = checkBooleanFalse($campanha,"permitir_incluir_item");
+      $campanha = checkBooleanFalse($campanha,"permitir_alterar_item");
+      $campanha = checkBooleanFalse($campanha,"permitir_alterar_quantidade_item");
+      $campanha = checkBooleanFalse($campanha,"permitir_excluir_item");
+      $campanha = checkBooleanFalse($campanha,"permitir_entregar_item");
+      $campanha = checkBooleanFalse($campanha,"permitir_alterar_moedas");
+      $campanha = checkBooleanFalse($campanha,"permitir_entregar_moedas");
+      return $campanha;
+    }
+
     try {
 
         $conexao = conectar();
@@ -67,21 +88,11 @@
                 $campanha = $lista[0];
                 if ($campanha['eh_narrador'] && ($entrada['uuid'] == $campanha['uuid'])) {
 
+                    $entrada = converterBooleansCampanha($entrada);
                     $url_narrador = alterarCampanha($conexao,$entrada);
 
                     if ($url_narrador) {
-
-                        obterDadosCampanha($conexao,$url_narrador);
-
-                        /*
-                        $retorno = array();
-                        $retorno['url_narrador'] = $url_narrador;
-
-                        header('Content-Type: application/json');
-                        echo json_encode($retorno,JSON_UNESCAPED_UNICODE);
-                        die();
-                        */
-
+                        obterDadosCampanha($conexao,$url_narrador);                        
                     } else {
                         header("HTTP/1.1 400");
                         die();

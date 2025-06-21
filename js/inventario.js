@@ -26,7 +26,7 @@ function openJustLoading() {
 
 function closeLoading() {
   esconder_shimmer();
-  renderBotaoSalvar();
+  renderBotaoVoltar();
   document.getElementById('loading').style.display = 'none';
 }
 
@@ -152,7 +152,7 @@ function obterValorBotaoSalvar() {
   return retorno;
 }
 
-function renderBotaoSalvar() {
+function renderBotaoVoltar() {
   let valor_botao_salvar = obterValorBotaoSalvar();
   if (valor_botao_salvar.possui_href) {
     mostrar_elemento('header-botao-voltar');
@@ -466,6 +466,55 @@ function validarEnviarMoedas(json,callback) {
   return;
 }
 
+function validarItem(json,callback) {
+  if (!uuidEhValido(json.uuid_personagem)) {
+    renderWarningToast('Ocorreu um erro ao identificar o Personagem!');
+    callback(false);
+    return;
+  }
+
+  if (!stringEhValida(json.descricao)) {
+    renderWarningToast('O campo Item está inválido!');
+    callback(false);
+    return;
+  }
+  if (palavraEhProibida(json.descricao)) {
+    renderWarningToast('Há palavras proibidas no campo Item!');
+    callback(false);
+    return;
+  }
+
+  let quantidade = validarNumeroInteiro(json.quantidade);
+  if (quantidade.valido) {
+    if (quantidade.valor < 0) {
+      quantidade.valor = 0;
+    }
+    json.quantidade = quantidade.valor;
+  } else {
+    renderWarningToast('A quantidade de itens é inválida!');
+    callback(false);
+    return;
+  }
+
+  let peso_unitario = validarNumeroComVirgula(json.peso_unitario);
+  if (peso_unitario.valido) {
+    json.peso_unitario = peso_unitario.valor;
+  } else {
+    renderWarningToast('O Peso está inválido!');
+    callback(false);
+    return;
+  }
+
+  if (!uuidEhValido(json.uuid_medida_peso_unitario)) {
+    renderWarningToast('A unidade do peso está inválida!');
+    callback(false);
+    return;
+  }
+
+  callback(true);
+  return;
+}
+
 /******************************************************************************/
 /******************************      API       ********************************/
 /******************************************************************************/
@@ -573,6 +622,15 @@ function excluir(url,uuid,sucesso,falha) {
     consumirAPI(
         'DELETE',
         `${url}?uuid=${uuid}`,
+        sucesso,
+        falha
+    );
+}
+
+function excluirItem(url,uuid,quem_esta_acessando,sucesso,falha) {
+    consumirAPI(
+        'DELETE',
+        `${url}?uuid=${uuid}&quem-esta-acessando=${quem_esta_acessando}`,
         sucesso,
         falha
     );
@@ -1070,7 +1128,6 @@ function render_personagens_editar_permissoes(json) {
     mostrar_elemento('personagens_editar_form_alterar_campanhas');
     mostrar_elemento('personagens_excluir');
     mostrar_elemento('personagens_excluir_form');
-    mostrar_elemento('itens_listar_inserir');
   } else if (itsTrue(json.eh_jogador)) {
     mostrar_elemento('personagens_editar_salvar');
     enableInput('personagens_editar_nome');
@@ -1083,7 +1140,6 @@ function render_personagens_editar_permissoes(json) {
     }
     mostrar_elemento('personagens_excluir');
     mostrar_elemento('personagens_excluir_form');
-    mostrar_elemento('itens_listar_inserir');
   } else {
     esconder_elemento('personagens_editar_salvar');
     disableInput('personagens_editar_nome');
@@ -1092,15 +1148,18 @@ function render_personagens_editar_permissoes(json) {
     esconder_elemento('personagens_editar_permissao');
     esconder_elemento('personagens_excluir');
     esconder_elemento('personagens_excluir_form');
-    esconder_elemento('itens_listar_inserir');
   }
 }
 
-function renderLinhaItem_botao(bloco,classe,src,innerHTML,esconder,evento) {
+function renderLinhaItem_botao(id,bloco,classe,src,innerHTML,esconder,disabled,evento) {
   let button = document.createElement('button');
+  button.id = id;
   button.setAttribute('type','button');
   if (esconder) {
     button.style.display = 'none';
+  }
+  if (disabled) {
+    button.setAttribute('disabled','disabled');
   }
 
   if ( (classe) && (classe != '') ) {
@@ -1156,18 +1215,50 @@ function renderLinhaItem_input(bloco,type,value,id,disabled,min,classe) {
   bloco.appendChild(input);
 }
 
-function renderLinhaItem(medidas,select_medidas,item) {
+function obterQuemEstaAcessando() {
+  return document.getElementById('personagens_editar_quem_esta_acessando').value;
+}
+
+function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_log) {
+  /* IDs */
+  let hidden_item_id = `id_${item.uuid}`;
+  let input_item_id = `item_${item.uuid}`;
+  let input_quantidade_id = `quantidade_${item.uuid}`;
+  let bloco_log_id = `log_${item.uuid}`;
+  let bloco_mensagem_id = `mensagem_${item.uuid}`;
+  let input_peso_id = `peso_${item.uuid}`;
+  let select_medidas_clonado_id = `medida_${item.uuid}`;
+  let button_usar_id = `button-usar_${item.uuid}`;
+  let button_log_id = `button-log_${item.uuid}`;
+  let button_editar_id = `button-editar_${item.uuid}`;
+  let button_salvar_id = `button-salvar_${item.uuid}`;
+  let button_excluir_id = `button-excluir_${item.uuid}`;
+  let button_inserir_id = `button-inserir_${item.uuid}`;
+  let button_cancelar_id = `button-cancelar_${item.uuid}`;
+
+  let ehUsuarioComPermissao = (permissoes.eh_narrador || permissoes.eh_jogador);
+
   let linha = document.createElement('div');
+  linha.id = item.uuid;
   linha.classList.add('bloco');
   linha.classList.add('bloco-item');
+
+  /* UUID Item */
+  renderLinhaItem_input(
+    linha,
+    'hidden',
+    item.uuid,
+    hidden_item_id,
+    false,
+    null,
+    null
+  );
 
   /* Descrição */
   let bloco_input_item = document.createElement('div');
   bloco_input_item.classList.add('bloco');
   bloco_input_item.classList.add('item');
   bloco_input_item.classList.add('borda');
-
-  let input_item_id = `item_${item.uuid}`;
 
   renderLinhaItem_label(
     bloco_input_item,
@@ -1176,38 +1267,213 @@ function renderLinhaItem(medidas,select_medidas,item) {
     'Item'
   );
 
+  let bloco_input_item_classe = null;
+  if (!editar) {
+    bloco_input_item_classe = 'inserir';
+  }
+
   renderLinhaItem_input(
     bloco_input_item,
     'text',
     item.descricao,
     input_item_id,
-    true,
+    editar,
     null,
-    null
+    bloco_input_item_classe
   );
-  /*
-  let input_item = document.createElement('input');
-  input_item.setAttribute('type','text');
-  input_item.value = item.descricao;
-  input_item.id = input_item_id;
-  input_item.setAttribute('name',input_item_id);
-  input_item.setAttribute('disabled','disabled');
-  input_item.setAttribute('readonly','readonly');
-
-  bloco_input_item.appendChild(input_item);
-  */
   /* Descrição */
+
+  if (editar) {
+    // EDITAR
+
+    /* Botão Editar */
+    let podeAlterarItem = (ehUsuarioComPermissao && permissoes.permitir_alterar_item);
+
+    renderLinhaItem_botao(
+      button_editar_id,
+      bloco_input_item,
+      'verde',
+      'img/pen-to-square-solid.svg',
+      'Editar',
+      false,
+      !podeAlterarItem,
+      (event)=>{
+        event.preventDefault();
+        enableInput(input_item_id);
+        enableInput(input_quantidade_id);
+        enableInput(input_peso_id);
+        enableInput(select_medidas_clonado_id);
+        esconder_elemento(button_editar_id);
+        mostrar_elemento(button_salvar_id);
+      }
+    );
+
+    /* Botão Salvar */
+    renderLinhaItem_botao(
+      button_salvar_id,
+      bloco_input_item,
+      'verde',
+      'img/floppy-disk-solid.svg',
+      'Salvar',
+      true,
+      !podeAlterarItem,
+      (event)=>{
+        event.preventDefault();
+        let uuid = document.getElementById(hidden_item_id).value;
+        let url_personagem = document.getElementById('personagens_editar_url').value;
+        let uuid_personagem = document.getElementById('personagens_editar_uuid').value;
+        let descricao = document.getElementById(input_item_id).value;
+        let quantidade = document.getElementById(input_quantidade_id).value;
+        let peso_unitario = document.getElementById(input_peso_id).value;
+        let select = document.getElementById(select_medidas_clonado_id);
+        let uuid_medida_peso_unitario = select.options[select.selectedIndex].value;
+        let uuid_medida_peso_unitario_texto = select.options[select.selectedIndex].innerHTML;
+
+        /* Mensagem */
+        let mensagem = `${obterQuemEstaAcessando()} alterou os dados do item de (Descrição: ${item.descricao}, Qtde: ${item.quantidade}, Peso: ${item.peso_unitario} ${item.medida}) para (Descrição: ${descricao}, Qtde: ${quantidade}, Peso: ${peso_unitario} ${uuid_medida_peso_unitario_texto})`;
+
+        let json_alterar = {
+          uuid: uuid,
+          url_personagem: url_personagem,
+          uuid_personagem: uuid_personagem,
+          descricao: descricao,
+          quantidade: quantidade,
+          peso_unitario: peso_unitario,
+          uuid_medida_peso_unitario: uuid_medida_peso_unitario,
+          mensagem: mensagem,
+        };
+
+        validarItem(json_alterar,(valido)=>{
+          if (valido) {
+            // Item válido
+
+            openJustLoading();
+            alterar(
+              createURL('itens.php'),
+              json_alterar,
+              (json_retorno)=>{
+                document.getElementById(bloco_mensagem_id).innerHTML = json_retorno.mensagem;
+                document.getElementById(bloco_log_id).style.display = 'block';
+                disableInput(input_item_id);
+                disableInput(input_quantidade_id);
+                disableInput(input_peso_id);
+                disableInput(select_medidas_clonado_id);
+                esconder_elemento(button_salvar_id);
+                mostrar_elemento(button_editar_id);
+
+                closeLoading();
+                renderToast('Item atualizado com sucesso!');
+              },
+              (erro)=>{
+                console.error(erro);
+                closeLoading();
+                renderErrorToast('Ocorreu um erro ao alterar o item!');
+              },
+            );
+
+            // Item válido
+          }
+        });
+      }
+    );
+
+  // EDITAR
+  } else { // INSERIR
+    let podeInserirItem = (ehUsuarioComPermissao && permissoes.permitir_incluir_item);
+
+    /* Botão Inserir */
+    renderLinhaItem_botao(
+      button_inserir_id,
+      bloco_input_item,
+      'inserir',
+      'img/floppy-disk-solid.svg',
+      'Inserir',
+      false,
+      !podeInserirItem,
+      (event)=>{
+        event.preventDefault();
+
+        let descricao = document.getElementById(input_item_id).value;
+        let quantidade = document.getElementById(input_quantidade_id).value;
+        let peso_unitario = document.getElementById(input_peso_id).value;
+        let select = document.getElementById(select_medidas_clonado_id);
+        let uuid_medida_peso_unitario = select.options[select.selectedIndex].value;
+        let uuid_medida_peso_unitario_texto = select.options[select.selectedIndex].innerHTML;
+
+        /* Mensagem */
+        let mensagem = `${obterQuemEstaAcessando()} inseriu o item (Descrição: ${descricao}, Qtde: ${quantidade}, Peso: ${peso_unitario} ${uuid_medida_peso_unitario_texto})`;
+
+        item.descricao = descricao;
+        item.quantidade = quantidade;
+        item.peso_unitario = peso_unitario;
+        item.uuid_medida_peso_unitario = uuid_medida_peso_unitario;
+        item.mensagem = mensagem;
+
+        validarItem(item,(valido)=>{
+          if (valido) {
+            // Item válido
+
+            openJustLoading();
+            inserir(
+              createURL('itens.php'),
+              item,
+              (json_retorno)=>{
+                /* Itens */
+                obter_com_parametro(
+                  createURL('itens.php'),
+                  'personagem',
+                  item.url_personagem,
+                  (json_lista_itens)=>{
+                    let lista = document.getElementById('itens_listar_lista');
+                    lista.innerHTML = '';
+
+                    // Lista de itens
+                    json_lista_itens.itens.forEach((entry, index) => {
+                      let eh_para_exibir_log = false;
+                      if (entry.uuid === item.uuid) {
+                        eh_para_exibir_log = true;
+                      }
+                      let linha = renderLinhaItem(permissoes,medidas,select_medidas,entry,true,eh_para_exibir_log);
+                      lista.appendChild(linha);
+
+                      if (index === (json_lista_itens.itens.length - 1)) {
+                        closeLoading();
+                        renderToast('Item inserido com sucesso!');
+                      }
+                    });
+                    // Lista de itens
+
+                  },
+                  (erro)=>{
+                    console.error(erro);
+                    renderErrorToast('Ocorreu um erro ao obter os dados!');
+                    callback();
+                  },
+                );
+                /* Itens */
+              },
+              (erro)=>{
+                console.error(erro);
+                closeLoading();
+                renderErrorToast('Ocorreu um erro ao inserir o item!');
+              },
+            );
+
+            // Item válido
+          }
+        });
+      }
+    );
+
+  } // INSERIR
 
   linha.appendChild(bloco_input_item);
 
   let bloco_outros = document.createElement('div');
   bloco_outros.classList.add('bloco');
   bloco_outros.classList.add('item');
-  bloco_outros.classList.add('borda');
 
   /* Quantidade */
-  let input_quantidade_id = `quantidade_${item.uuid}`;
-
   renderLinhaItem_label(
     bloco_outros,
     input_quantidade_id,
@@ -1220,125 +1486,206 @@ function renderLinhaItem(medidas,select_medidas,item) {
     'number',
     item.quantidade,
     input_quantidade_id,
-    true,
+    editar,
     0,
     null
   );
-  /*
-  let input_quantidade = document.createElement('input');
-  input_quantidade.setAttribute('type','number');
-  input_quantidade.value = item.quantidade;
-  input_quantidade.setAttribute('min', '0');
-  input_quantidade.id = input_quantidade_id;
-  input_quantidade.setAttribute('name',input_quantidade_id);
-  input_quantidade.setAttribute('disabled','disabled');
-  input_quantidade.setAttribute('readonly','readonly');
 
-  bloco_outros.appendChild(input_quantidade);
-  */
+  if (editar) { // EDITAR
 
-  /* Botão Quantidade */
-  renderLinhaItem_botao(
-    bloco_outros,
-    'usar',
-    'img/file-circle-minus-solid.svg',
-    'Usar',
-    false,
-    (event)=>{event.preventDefault();}
-  );
-  /* Quantidade */
+    /* Botão Quantidade */
+    let podeAlterarQuantidade = (
+      ehUsuarioComPermissao &&
+      (permissoes.permitir_alterar_quantidade_item || permissoes.permitir_alterar_item)
+    );
+
+    renderLinhaItem_botao(
+      button_usar_id,
+      bloco_outros,
+      'usar',
+      'img/file-circle-minus-solid.svg',
+      'Usar',
+      false,
+      !podeAlterarQuantidade,
+      (event)=>{
+        event.preventDefault();
+        let url_personagem = document.getElementById('personagens_editar_url').value;
+        let input_quantidade = document.getElementById(input_quantidade_id);
+        let retorno = validarNumeroInteiro(input_quantidade.value);
+        if (retorno.valido) {
+          let quantidade = retorno.valor;
+          if (quantidade > 0) {
+            let quantidade_antiga = quantidade;
+            quantidade = quantidade - 1;
+
+            /* Mensagem */
+            let mensagem = `${obterQuemEstaAcessando()} alterou a quantidade do item ${item.descricao} de ${quantidade_antiga} para ${quantidade}.`;
+            let json_alterar = {
+              url_personagem: url_personagem,
+              uuid: item.uuid,
+              quantidade: quantidade,
+              mensagem: mensagem
+            };
+
+            openJustLoading();
+            alterar(
+              createURL('itens.php'),
+              json_alterar,
+              (json_retorno)=>{
+                document.getElementById(bloco_mensagem_id).innerHTML = json_retorno.mensagem;
+                document.getElementById(bloco_log_id).style.display = 'block';
+                input_quantidade.value = quantidade;
+
+                closeLoading();
+                renderToast('Quantidade do item atualizada!');
+              },
+              (erro)=>{
+                console.error(erro);
+                closeLoading();
+                renderErrorToast('Ocorreu um erro ao alterar a quantidade!');
+              },
+            );
+
+          } else {
+            renderWarningToast('O personagem não possui unidades deste item!');
+          }
+        }
+      }
+    );
+    /* Quantidade */
+
+  } // EDITAR
 
   /* Peso */
-  let input_peso_id = `peso_${item.uuid}`;
-
   renderLinhaItem_label(
     bloco_outros,
     input_peso_id,
     'espaco',
     'Peso'
   );
-  
+
   renderLinhaItem_input(
     bloco_outros,
     'text',
     item.peso_unitario,
     input_peso_id,
-    true,
+    editar,
     null,
     'like-number'
   );
-  /*
-  let input_peso = document.createElement('input');
-  input_peso.setAttribute('type','text');
-  input_peso.classList.add('like-number');
-  input_peso.value = item.peso_unitario;
-  input_peso.id = input_peso_id;
-  input_peso.setAttribute('name',input_peso_id);
-  input_peso.setAttribute('disabled','disabled');
-  input_peso.setAttribute('readonly','readonly');
-
-  bloco_outros.appendChild(input_peso);
-  */
 
   let select_medidas_clonado = select_medidas.cloneNode(true);
-  select_medidas_clonado.id = `medida_${item.uuid}`;
+  select_medidas_clonado.id = select_medidas_clonado_id;
   let index_medida = medidas.findIndex(entry => entry.uuid === item.uuid_medida_peso_unitario);
   select_medidas_clonado.selectedIndex = index_medida;
+  if (editar) {
+    select_medidas_clonado.setAttribute('disabled','disabled');
+    select_medidas_clonado.setAttribute('readonly','readonly');
+  }
   bloco_outros.appendChild(select_medidas_clonado);
   /* Peso */
 
-  /* Botão Editar */
-  renderLinhaItem_botao(
-    bloco_outros,
-    null,
-    'img/pen-to-square-solid.svg',
-    'Editar',
-    false,
-    (event)=>{event.preventDefault();}
-  );
+  if (editar) {
+    // EDITAR
 
-  /* Botão Salvar */
-  renderLinhaItem_botao(
-    bloco_outros,
-    null,
-    'img/floppy-disk-solid.svg',
-    'Salvar',
-    true,
-    (event)=>{event.preventDefault();}
-  );
+    /* Botão Excluir */
+    let podeExcluirItem = (ehUsuarioComPermissao && permissoes.permitir_excluir_item);
 
-  /* Botão Log */
-  renderLinhaItem_botao(
-    bloco_outros,
-    'espaco',
-    'img/file-lines-solid.svg',
-    'Log',
-    false,
-    (event)=>{event.preventDefault();}
-  );
+    renderLinhaItem_botao(
+      button_excluir_id,
+      bloco_outros,
+      null,
+      'img/trash-solid.svg',
+      'Excluir',
+      false,
+      !podeExcluirItem,
+      (event)=>{
+        event.preventDefault();
+        let uuid = document.getElementById(hidden_item_id).value;
+        document.getElementById('modal_item_uuid').value = uuid;
+        let quem_esta_acessando = obterQuemEstaAcessando();
+        document.getElementById('modal_item_quem_esta_acessando').value = quem_esta_acessando;
+        mostrar_elemento('modal_item');
+      }
+    );
+
+    /* Botão Log */
+    renderLinhaItem_botao(
+      button_log_id,
+      bloco_outros,
+      'espaco',
+      'img/file-lines-solid.svg',
+      'Log',
+      false,
+      false,
+      (event)=>{
+        event.preventDefault();
+        let div_log = document.getElementById(bloco_log_id);
+        if (div_log.style.display === 'none') {
+          div_log.style.display = 'block';
+        } else {
+          div_log.style.display = 'none';
+        }
+      }
+    );
+
+    // EDITAR
+  }  else { // INSERIR
+    /* Botão Cancelar */
+    renderLinhaItem_botao(
+      button_cancelar_id,
+      bloco_outros,
+      'cancelar',
+      'img/xmark-solid.svg',
+      'Cancelar',
+      false,
+      false,
+      (event)=>{
+        event.preventDefault();
+        let elementToRemove = document.getElementById(item.uuid);
+        if (elementToRemove) {
+          elementToRemove.remove();
+        }
+
+        let lista = document.getElementById('itens_listar_lista');
+        let registros = [...lista.querySelectorAll('div.bloco-item')];
+        if (registros.length == 0) {
+          let div_sem_itens = renderLinhaVaziaItens('Personagem sem itens');
+          lista.appendChild(div_sem_itens);
+        }
+      }
+    );
+  } // INSERIR
 
   linha.appendChild(bloco_outros);
 
-  /* Log */
-  let bloco_log = document.createElement('div');
-  bloco_log.classList.add('bloco');
-  bloco_log.classList.add('item');
+  if (editar) { // EDITAR
 
-  let label_log = document.createElement('label');
-  label_log.classList.add('log');
-  label_log.innerHTML = item.alteracao;
-  bloco_log.appendChild(label_log);
-  /* Log */
+    /* Log */
+    let bloco_log = document.createElement('div');
+    bloco_log.id = bloco_log_id;
+    bloco_log.classList.add('bloco');
+    bloco_log.classList.add('item');
+    if (!exibir_log) {
+      bloco_log.style.display = 'none';
+    }
 
-  linha.appendChild(bloco_log);
+    let label_log = document.createElement('label');
+    label_log.id = bloco_mensagem_id;
+    label_log.classList.add('log');
+    label_log.innerHTML = item.alteracao;
+    bloco_log.appendChild(label_log);
+    /* Log */
+
+    linha.appendChild(bloco_log);
+
+  } // EDITAR
 
   return linha;
 }
 
 function renderMedidasSelect(medidas,callback) {
   let select = document.createElement('select');
-  select.setAttribute('disabled','disabled');
-  select.setAttribute('readonly','readonly');
 
   medidas.forEach((medida, index) => {
     let option = document.createElement('option');
@@ -1352,46 +1699,44 @@ function renderMedidasSelect(medidas,callback) {
   });
 }
 
-function listarItens(callback) {
+function listarItens(personagem,callback) {
   let lista = document.getElementById('itens_listar_lista');
   lista.innerHTML = '';
   let url = document.getElementById('personagens_editar_url').value;
 
-  /* Personagens */
+  /* Itens */
   obter_com_parametro(
     createURL('itens.php'),
     'personagem',
     url,
     (json)=>{
-      if (json.itens.length == 0) {
-        let div = renderLinhaVaziaItens('Personagem sem itens');
-        lista.appendChild(div);
-        callback();
-      } else {
+      renderMedidasSelect(json.medidas,(select_medidas)=>{
+        let permissoes = {
+          ...{
+            eh_narrador: itsTrue(personagem.eh_narrador),
+            eh_jogador: itsTrue(personagem.eh_jogador),
+            eh_visualizador: itsTrue(personagem.eh_visualizador),
+          },
+          ...personagem.permissoes
+        };
 
-        renderMedidasSelect(json.medidas,(select_medidas)=>{
+        if (json.itens.length == 0) {
+          render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
+          let div = renderLinhaVaziaItens('Personagem sem itens');
+          lista.appendChild(div);
+          callback();
+        } else {
           json.itens.forEach((item, index) => {
-            let linha = renderLinhaItem(json.medidas,select_medidas,item);
+            let linha = renderLinhaItem(permissoes,json.medidas,select_medidas,item,true,false);
             lista.appendChild(linha);
 
             if (index === (json.itens.length - 1)) {
+              render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
               callback();
             }
           });
-        });
-
-
-        /*
-        json.forEach((entry, index) => {
-          let div = renderLinhaPersonagem(entry);
-          lista.appendChild(div);
-
-          if (index === (json.length - 1)) {
-            callback();
-          }
-        });
-        */
-      }
+        }
+      });
     },
     (erro)=>{
       console.error(erro);
@@ -1399,7 +1744,54 @@ function listarItens(callback) {
       callback();
     },
   );
-  /* Personagens */
+  /* Itens */
+}
+
+function render_botao_itens_listar_inserir(json,permissoes,medidas,select_medidas) {
+
+  let podeIncluirItem = (
+    (permissoes.eh_narrador || permissoes.eh_jogador) &&
+    permissoes.permitir_incluir_item
+  );
+
+  if (podeIncluirItem) { // PODE INCLUIR
+
+    let div_titulo = document.getElementById('itens_listar');
+    let button = document.createElement('button');
+    let img = document.createElement('img');
+    img.src = 'img/plus-solid.svg';
+    button.appendChild(img);
+    let span = document.createElement('span');
+    span.innerHTML = 'Inserir';
+    button.appendChild(span);
+    div_titulo.appendChild(button);
+
+    button.addEventListener('click',(event)=>{
+      event.preventDefault();
+
+      let novo_item = {
+        uuid: generateUUID(),
+        descricao: '',
+        quantidade: 1,
+        peso_unitario: '0',
+        uuid_medida_peso_unitario: json.uuid_medida_padrao,
+        uuid_personagem: json.uuid,
+        url_personagem: document.getElementById('personagens_editar_url').value,
+      };
+
+      let lista = document.getElementById('itens_listar_lista');
+
+      /* Se não houver registros, apaga a mensagem "sem itens" */
+      let sem_registros = lista.querySelector('div.bloco > label.sem-registros');
+      if (sem_registros) {
+        lista.innerHTML = '';
+      }
+
+      let linha = renderLinhaItem(permissoes,medidas,select_medidas,novo_item,false,false);
+      lista.insertBefore(linha, lista.firstChild);
+    });
+
+  } // PODE INCLUIR
 }
 
 function render_personagens_editar(json,callback) {
@@ -1437,7 +1829,7 @@ function render_personagens_editar(json,callback) {
                   render_personagens_editar_campo(propriedade,valor,()=>{
                     if (index === (propriedades.length - 1)) {
                       renderListaMoedas(json,()=>{
-                        listarItens(()=>{
+                        listarItens(json,()=>{
                           closeLoading();
                           callback();
                         });
@@ -1880,6 +2272,13 @@ function modal_fechar(event) {
   esconder_elemento('modal');
 }
 
+function modal_item_fechar(event) {
+  event.preventDefault();
+  document.getElementById('modal_item_uuid').value = '';
+  document.getElementById('modal_item_quem_esta_acessando').value = '';
+  esconder_elemento('modal_item');
+}
+
 function verificar_mensagem() {
   let existeMensagem = localStorage.getItem(VARIAVEL_MENSAGEM);
   if ( (existeMensagem) && (existeMensagem != '') ) {
@@ -1913,6 +2312,41 @@ function modal_excluir(event) {
   }
 }
 
+function modal_item_excluir(event) {
+  event.preventDefault();
+  let uuid = document.getElementById('modal_item_uuid').value;
+  let quem_esta_acessando = document.getElementById('modal_item_quem_esta_acessando').value;
+
+  if ( (stringEhValida(quem_esta_acessando)) && (uuidEhValido(uuid)) ) {
+    openJustLoading();
+    excluirItem(
+      createURL('itens.php'),
+      uuid,
+      quem_esta_acessando,
+      ()=>{
+        let elementToRemove = document.getElementById(uuid);
+        if (elementToRemove) {
+          elementToRemove.remove();
+        }
+
+        document.getElementById('modal_item_uuid').value = '';
+        document.getElementById('modal_item_quem_esta_acessando').value = '';
+        esconder_elemento('modal_item');
+
+        closeLoading();
+        renderToast('Item excluído com sucesso!');
+      },
+      (erro)=>{
+        closeLoading();
+        console.error(erro);
+        renderErrorToast('Ocorreu um erro ao excluir o item!');
+      },
+    );
+  } else {
+    renderErrorToast('Ocorreu um erro ao excluir o item!');
+  }
+}
+
 function renderModalExcluir(pagina,uuid,mensagem) {
   document.getElementById('modal_pagina').value = pagina;
   document.getElementById('modal_uuid').value = uuid;
@@ -1937,6 +2371,11 @@ function definirListeners() {
   document.getElementById('modal_fechar').addEventListener('click',modal_fechar);
   document.getElementById('modal_cancelar').addEventListener('click',modal_fechar);
   document.getElementById('modal_excluir').addEventListener('click',modal_excluir);
+
+  /* Modal Item */
+  document.getElementById('modal_item_fechar').addEventListener('click',modal_item_fechar);
+  document.getElementById('modal_item_cancelar').addEventListener('click',modal_item_fechar);
+  document.getElementById('modal_item_excluir').addEventListener('click',modal_item_excluir);
 
   /* Tela */
   document.getElementById('texto-botao-mostrar').addEventListener('click',texto_botao_mostrar_listener);
@@ -2048,6 +2487,9 @@ function esconder_todos() {
 
   esconder_elemento('itens_listar');
   esconder_elemento('itens_listar_lista');
+
+  esconder_elemento('modal');
+  esconder_elemento('modal_item');
 }
 
 function router(rota,mensagem) {

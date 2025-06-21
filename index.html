@@ -57,6 +57,37 @@
       </div>
     </div>
 
+    <div class="modal" id="modal_item">
+      <div class="form">
+        <div class="titulo">
+          <h2>Atenção</h2>
+          <button id="modal_item_fechar">
+            <img src="img/xmark-solid.svg" />
+          </button>
+        </div>
+        <div class="linha">
+          <input type="hidden" value="" id="modal_item_uuid">
+          <input type="hidden" value="" id="modal_item_quem_esta_acessando">
+
+          <div class="bloco">
+            <label>A exclusão do item não pode ser revertida.</label>
+            <label>Realmente deseja excluir este item?</label>
+          </div>
+          <div class="bloco bloco-botoes">
+            <button type="button" class="cancelar" id="modal_item_cancelar">
+    					<img src="img/xmark-solid.svg">
+    					<span>Cancelar</span>
+    				</button>
+
+            <button type="button" id="modal_item_excluir">
+    					<img src="img/trash-solid.svg">
+    					<span>Excluir</span>
+    				</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <header class="black">
       <button type="button" id="header-botao-voltar">
         <img src="img/arrow-left-solid.svg">
@@ -371,6 +402,8 @@
         <input type="hidden" value="" id="personagens_editar_uuid">
         <input type="hidden" value="" id="personagens_editar_url">
         <input type="hidden" value="" id="personagens_editar_uuid_campanha">
+        <input type="hidden" value="" id="personagens_editar_quem_esta_acessando">
+        <input type="hidden" value="" id="personagens_editar_uuid_medida_padrao">
 
         <div class="bloco menor">
           <label for="personagens_editar_nome">Nome</label>
@@ -467,10 +500,12 @@
       <!-- Personagens Listar Itens -->
       <div class="titulo titulo-editar" id="itens_listar">
         <h2>Itens do Personagem</h2>
+        <!--
         <button id="itens_listar_inserir">
           <img src="img/plus-solid.svg" />
           <span>Inserir</span>
         </button>
+        -->
       </div>
       <div class="linha linha-editar" id="itens_listar_lista">
 

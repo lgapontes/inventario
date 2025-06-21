@@ -121,6 +121,14 @@
         return $json;
     }
 
+    function verificarBooleanParaInteiro($json,$campo) {
+        if ($json[$campo] == true) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     /* Router */
 
     /* Sistemas */
@@ -896,6 +904,7 @@
             personagens.url_narrador,
             personagens.url_jogador,
             personagens.url_visualizador,
+            campanhas.uuid_medida_padrao,
 
             CASE WHEN personagens.url_narrador = ?
             THEN true ELSE false END as eh_narrador,
@@ -910,6 +919,12 @@
                 WHEN personagens.url_visualizador = ? THEN campanhas.url_visualizador
                 ELSE campanhas.url_visualizador
             END as url_campanha,
+
+            CASE
+                WHEN personagens.url_narrador = ? THEN campanhas.narrador
+                WHEN personagens.url_jogador = ? THEN personagens.jogador
+                ELSE ''
+            END as quem_esta_acessando,
 
             json_object(
                 'controlar_peso',campanhas.controlar_peso,
@@ -935,7 +950,7 @@
           )
         QUERY;
 
-        $resultado = $conexao->execute_query($query, [$url,$url,$url,$url,$url,$url,$url,$url,$url]);
+        $resultado = $conexao->execute_query($query, [$url,$url,$url,$url,$url,$url,$url,$url,$url,$url,$url]);
 
         if ($resultado->num_rows > 0) {
             while($registro = $resultado->fetch_assoc()) {
@@ -1058,6 +1073,7 @@
 
     /* Itens */
 
+    /*
     function inserirItem($conexao,$registro) {
         $registro["uuid"] = guidv4();
 
@@ -1076,16 +1092,144 @@
             throw new Exception("Erro no banco de dados: " . $conexao->error);
         }
     }
+    */
 
-    function alterarQuantidadeItem($conexao,$uuid,$quantidade) {
-
-        $query = 'update itens set quantidade=?, data_alteracao=(SELECT CURRENT_TIMESTAMP()), data_exclusao=null where uuid=?';
-
-        if ($quantidade < 1) {
-            $quantidade = 0;
-
-            $query = 'update itens set quantidade=?, data_alteracao=(SELECT CURRENT_TIMESTAMP()), data_exclusao=(SELECT CURRENT_TIMESTAMP()) where uuid=?';
+    function inserirItem($conexao,$registro) {
+        if ($registro['quantidade'] < 1) {
+            $registro['quantidade'] = 0;
         }
+
+        $query = <<<QUERY
+          insert into itens (
+            uuid,
+            uuid_personagem,
+            descricao,
+            quantidade,
+            peso_unitario,
+            uuid_medida_peso_unitario,
+            data_cadastro
+          ) VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            (SELECT CURRENT_TIMESTAMP())
+          )
+        QUERY;
+
+        $resultado = $conexao->execute_query($query,[
+            $registro['uuid'],
+            $registro['uuid_personagem'],
+            $registro['descricao'],
+            $registro['quantidade'],
+            $registro['peso_unitario'],
+            $registro['uuid_medida_peso_unitario']
+        ]);
+
+        if (!$resultado) {
+            throw new Exception("Erro no banco de dados: " . $conexao->error);
+        }
+
+        $uuid_itens_alteracoes = guidv4();
+        $query = 'insert into itens_alteracoes (uuid,uuid_item,alteracao) values (?,?,?)';
+
+        $resultado = $conexao->execute_query($query,[
+            $uuid_itens_alteracoes,
+            $registro['uuid'],
+            $registro['mensagem']
+        ]);
+
+        if (!$resultado) {
+            throw new Exception("Erro no banco de dados: " . $conexao->error);
+        }
+
+        return obterUltimaAlteracaoItem($conexao,$registro['uuid']);
+    }
+
+    function obterPermissoesParaItensPorUrlPersonagem($conexao,$url) {
+        $registros = array();
+
+        $query = <<<QUERY
+        select
+            CASE WHEN personagens.url_narrador = ?
+            THEN true ELSE false END as eh_narrador,
+            CASE WHEN personagens.url_jogador = ?
+            THEN true ELSE false END as eh_jogador,
+            CASE WHEN personagens.url_visualizador = ?
+            THEN true ELSE false END as eh_visualizador,
+            campanhas.controlar_peso,
+            campanhas.permitir_incluir_item,
+            campanhas.permitir_alterar_item,
+            campanhas.permitir_alterar_quantidade_item,
+            campanhas.permitir_excluir_item,
+            campanhas.permitir_entregar_item,
+            campanhas.permitir_alterar_moedas,
+            campanhas.permitir_entregar_moedas
+        from personagens
+        inner join campanhas on campanhas.uuid = personagens.uuid_campanha
+        where
+          personagens.data_exclusao is null and
+          campanhas.data_exclusao is null and
+          (
+              personagens.url_narrador = ? or
+              personagens.url_jogador = ? or
+              personagens.url_visualizador = ?
+          )
+        QUERY;
+
+        $resultado = $conexao->execute_query($query, [$url,$url,$url,$url,$url,$url]);
+
+        if ($resultado->num_rows > 0) {
+            while($registro = $resultado->fetch_assoc()) {
+              $registro = converterBoolean($registro,'eh_narrador');
+              $registro = converterBoolean($registro,'eh_jogador');
+              $registro = converterBoolean($registro,'eh_visualizador');
+              $registro = converterBoolean($registro,'controlar_peso');
+              $registro = converterBoolean($registro,'permitir_incluir_item');
+              $registro = converterBoolean($registro,'permitir_alterar_item');
+              $registro = converterBoolean($registro,'permitir_alterar_quantidade_item');
+              $registro = converterBoolean($registro,'permitir_excluir_item');
+              $registro = converterBoolean($registro,'permitir_entregar_item');
+              $registro = converterBoolean($registro,'permitir_alterar_moedas');
+              $registro = converterBoolean($registro,'permitir_entregar_moedas');
+              array_push($registros,$registro);
+            }
+        }
+
+        return $registros;
+    }
+
+    function obterUltimaAlteracaoItem($conexao,$uuid) {
+      $registros = array();
+
+      $query = <<<QUERY
+        select
+        CONCAT(DATE_FORMAT(max(data_alteracao), '%d/%m/%Y %H:%i:%s'),CONCAT(': ',alteracao)) as mensagem
+        from itens_alteracoes
+        where uuid_item = ?
+        group by alteracao, data_alteracao
+        order by data_alteracao desc limit 1
+      QUERY;
+
+      $resultado = $conexao->execute_query($query,[$uuid]);
+      if (!$resultado) {
+          throw new Exception("Erro no banco de dados: " . $conexao->error);
+      }
+
+      if ($resultado->num_rows > 0) {
+          while($registro = $resultado->fetch_assoc()) {
+              array_push($registros,$registro);
+          }
+      }
+
+      return $registros;
+    }
+
+    function alterarQuantidadeItem($conexao,$uuid,$quantidade,$mensagem) {
+
+        $query = 'update itens set quantidade=? where uuid=?';
 
         $resultado = $conexao->execute_query($query,[
             $quantidade,
@@ -1096,19 +1240,37 @@
             throw new Exception("Erro no banco de dados: " . $conexao->error);
         }
 
-        return obterItem($conexao,$uuid);
+        $uuid_itens_alteracoes = guidv4();
+        $query = 'insert into itens_alteracoes (uuid,uuid_item,alteracao) values (?,?,?)';
+
+        $resultado = $conexao->execute_query($query,[
+            $uuid_itens_alteracoes,
+            $uuid,
+            $mensagem
+        ]);
+
+        if (!$resultado) {
+            throw new Exception("Erro no banco de dados: " . $conexao->error);
+        }
+
+        return obterUltimaAlteracaoItem($conexao,$uuid);
     }
 
     function alterarItem($conexao,$registro) {
-
         if ($registro['quantidade'] < 1) {
             $registro['quantidade'] = 0;
         }
 
-        $query = 'update itens set uuid_personagem=?, descricao=?, quantidade=?, peso_unitario=?, uuid_medida_peso_unitario=?, data_alteracao=(SELECT CURRENT_TIMESTAMP()) where uuid=?';
+        $query = <<<QUERY
+          update itens set
+            descricao=?,
+            quantidade=?,
+            peso_unitario=?,
+            uuid_medida_peso_unitario=?
+          where uuid=?
+        QUERY;
 
         $resultado = $conexao->execute_query($query,[
-            $registro['uuid_personagem'],
             $registro['descricao'],
             $registro['quantidade'],
             $registro['peso_unitario'],
@@ -1120,17 +1282,24 @@
             throw new Exception("Erro no banco de dados: " . $conexao->error);
         }
 
-        if ($registro['quantidade'] < 1) {
-            excluirItem($conexao,$registro['uuid']);
+        $uuid_itens_alteracoes = guidv4();
+        $query = 'insert into itens_alteracoes (uuid,uuid_item,alteracao) values (?,?,?)';
+
+        $resultado = $conexao->execute_query($query,[
+            $uuid_itens_alteracoes,
+            $registro['uuid'],
+            $registro['mensagem']
+        ]);
+
+        if (!$resultado) {
+            throw new Exception("Erro no banco de dados: " . $conexao->error);
         }
 
-        return obterItem($conexao,$registro['uuid']);
+        return obterUltimaAlteracaoItem($conexao,$registro['uuid']);
     }
 
     function obterItensPorPersonagem($conexao,$url_personagem) {
         $registros = array();
-
-        //$query = "select *, CASE WHEN data_exclusao is null THEN false ELSE true END as excluido from itens";
 
         $query = <<<QUERY
           select
@@ -1154,8 +1323,8 @@
               CONCAT(DATE_FORMAT(max(inner1.data_alteracao), '%d/%m/%Y %H:%i:%s'),CONCAT(': ',inner1.alteracao))
               from itens_alteracoes as inner1
               where inner1.uuid_item = itens.uuid
-              group by inner1.alteracao
-              order by 1 desc limit 1
+              group by inner1.alteracao, inner1.data_alteracao
+              order by inner1.data_alteracao desc limit 1
             ) as alteracao
           from itens
           inner join medidas on medidas.uuid = itens.uuid_medida_peso_unitario
@@ -1167,6 +1336,7 @@
                 personagens.url_jogador = ? or
                 personagens.url_visualizador = ?
             )
+          order by itens.descricao
         QUERY;
 
         $resultado = $conexao->execute_query($query,[
@@ -1245,10 +1415,23 @@
         return $registros;
     }
 
-    function excluirItem($conexao,$uuid) {
+    function excluirItem($conexao,$uuid,$mensagem) {
         $query = 'update itens set data_exclusao=(SELECT CURRENT_TIMESTAMP()) where uuid = ?';
 
         $resultado = $conexao->execute_query($query,[$uuid]);
+
+        if (!$resultado) {
+            throw new Exception("Erro no banco de dados: " . $conexao->error);
+        }
+
+        $uuid_itens_alteracoes = guidv4();
+        $query = 'insert into itens_alteracoes (uuid,uuid_item,alteracao) values (?,?,?)';
+
+        $resultado = $conexao->execute_query($query,[
+            $uuid_itens_alteracoes,
+            $uuid,
+            $mensagem
+        ]);
 
         if (!$resultado) {
             throw new Exception("Erro no banco de dados: " . $conexao->error);

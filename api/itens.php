@@ -13,24 +13,59 @@
 
         } else if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-            $body = file_get_contents("php://input");
-            $entrada = json_decode($body,true);
+          $body = file_get_contents("php://input");
+          $entrada = json_decode($body,true);
+          $resultado = array();
 
-            if (
-                !array_key_exists("uuid_personagem",$entrada) ||
-                !array_key_exists("descricao",$entrada) ||
-                !array_key_exists("quantidade",$entrada) ||
-                !array_key_exists("peso_unitario",$entrada) ||
-                !array_key_exists("uuid_medida_peso_unitario",$entrada)
-            ) {
+          if (
+              array_key_exists("uuid",$entrada) &&
+              array_key_exists("url_personagem",$entrada) &&
+              array_key_exists("uuid_personagem",$entrada) &&
+              array_key_exists("descricao",$entrada) &&
+              array_key_exists("quantidade",$entrada) &&
+              array_key_exists("peso_unitario",$entrada) &&
+              array_key_exists("uuid_medida_peso_unitario",$entrada) &&
+              array_key_exists("mensagem",$entrada)
+          ) {
+            $lista_permissoes = obterPermissoesParaItensPorUrlPersonagem($conexao,$entrada["url_personagem"]);
+
+            if (count($lista_permissoes) == 1) {
+                $permissoes = $lista_permissoes[0];
+
+                if (
+                  ($permissoes["eh_narrador"] || $permissoes["eh_jogador"]) &&
+                  $permissoes["permitir_incluir_item"]
+                ) {
+                  // Pode inserir item
+
+                  $itens_alteracoes = inserirItem($conexao,$entrada);
+
+                  if (count($itens_alteracoes) == 1) {
+
+                      $json = $itens_alteracoes[0];
+
+                      header('Content-Type: application/json');
+                      echo json_encode($json,JSON_UNESCAPED_UNICODE);
+                      die();
+                  } else {
+                      header("HTTP/1.1 400");
+                      die();
+                  }
+
+                  // Pode inserir item
+                } else {
+                  header("HTTP/1.1 401");
+                  die();
+                }
+
+            } else {
                 header("HTTP/1.1 400");
                 die();
             }
-
-            inserirItem($conexao,$entrada);
-
-            header("HTTP/1.1 200");
-            die();
+          } else {
+              header("HTTP/1.1 400");
+              die();
+          }
 
         } else if ($_SERVER["REQUEST_METHOD"] === "PUT") {
 
@@ -40,43 +75,90 @@
 
             if (
                 array_key_exists("uuid",$entrada) &&
-                array_key_exists("alterar_quantidade",$entrada)
+                array_key_exists("url_personagem",$entrada) &&
+                array_key_exists("uuid_personagem",$entrada) &&
+                array_key_exists("descricao",$entrada) &&
+                array_key_exists("quantidade",$entrada) &&
+                array_key_exists("peso_unitario",$entrada) &&
+                array_key_exists("uuid_medida_peso_unitario",$entrada) &&
+                array_key_exists("mensagem",$entrada)
             ) {
-                $resultado = alterarQuantidadeItem($conexao,$entrada["uuid"],$entrada["alterar_quantidade"]);
-            } else if (
-                !array_key_exists("uuid",$entrada) ||
-                !array_key_exists("uuid_personagem",$entrada) ||
-                !array_key_exists("descricao",$entrada) ||
-                !array_key_exists("quantidade",$entrada) ||
-                !array_key_exists("peso_unitario",$entrada) ||
-                !array_key_exists("uuid_medida_peso_unitario",$entrada)
-            ) {
-                header("HTTP/1.1 400");
-                die();
-            } else {
-                $resultado = alterarItem($conexao,$entrada);
-            }
+              $lista_permissoes = obterPermissoesParaItensPorUrlPersonagem($conexao,$entrada["url_personagem"]);
 
-            if ($resultado) {
+              if (count($lista_permissoes) == 1) {
+                  $permissoes = $lista_permissoes[0];
 
-                if (count($resultado) == 1) {
+                  if (
+                    ($permissoes["eh_narrador"] || $permissoes["eh_jogador"]) &&
+                    $permissoes["permitir_alterar_item"]
+                  ) {
+                    // Pode alterar item
 
-                    $json = $resultado[0];
+                    $itens_alteracoes = alterarItem($conexao,$entrada);
 
-                    if ($json['excluido'] == '0') {
-                        $json['excluido'] = false;
+                    if (count($itens_alteracoes) == 1) {
+
+                        $json = $itens_alteracoes[0];
+
+                        header('Content-Type: application/json');
+                        echo json_encode($json,JSON_UNESCAPED_UNICODE);
+                        die();
                     } else {
-                        $json['excluido'] = true;
+                        header("HTTP/1.1 400");
+                        die();
                     }
 
-                    header('Content-Type: application/json');
-                    echo json_encode($json,JSON_UNESCAPED_UNICODE);
+                    // Pode alterar item
+                  } else {
+                    header("HTTP/1.1 401");
                     die();
+                  }
+
+              } else {
+                  header("HTTP/1.1 400");
+                  die();
+              }
+            } else if (
+                array_key_exists("url_personagem",$entrada) &&
+                array_key_exists("uuid",$entrada) &&
+                array_key_exists("quantidade",$entrada) &&
+                array_key_exists("mensagem",$entrada)
+            ) {
+                $lista_permissoes = obterPermissoesParaItensPorUrlPersonagem($conexao,$entrada["url_personagem"]);
+
+                if (count($lista_permissoes) == 1) {
+                    $permissoes = $lista_permissoes[0];
+
+                    if (
+                      ($permissoes["eh_narrador"] || $permissoes["eh_jogador"]) &&
+                      ($permissoes["permitir_alterar_quantidade_item"] || $permissoes["permitir_alterar_item"])
+                    ) {
+                      // Pode alterar item
+
+                      $itens_alteracoes = alterarQuantidadeItem($conexao,$entrada["uuid"],$entrada["quantidade"],$entrada["mensagem"]);
+
+                      if (count($itens_alteracoes) == 1) {
+
+                          $json = $itens_alteracoes[0];
+
+                          header('Content-Type: application/json');
+                          echo json_encode($json,JSON_UNESCAPED_UNICODE);
+                          die();
+                      } else {
+                          header("HTTP/1.1 400");
+                          die();
+                      }
+
+                      // Pode alterar item
+                    } else {
+                      header("HTTP/1.1 401");
+                      die();
+                    }
+
                 } else {
                     header("HTTP/1.1 400");
                     die();
                 }
-
             } else {
                 header("HTTP/1.1 400");
                 die();
@@ -100,70 +182,21 @@
               die();
             }
 
-            /*
-            $json = null;
-
-            if (
-                !array_key_exists("uuid",$_GET)
-            ) {
-                $json = obterItens($conexao);
-            } else if (
-                array_key_exists("personagem",$_GET)
-            ) {
-                $json = obterItemPorPersonagem($conexao,$_GET['personagem']);
-            } else {
-                $lista = obterItem($conexao,$_GET['uuid']);
-
-                if (count($lista) == 1) {
-                    $json = $lista[0];
-                }
-            }
-
-            if ($json == null) {
-                header("HTTP/1.1 404");
-                die();
-            } else {
-                if (is_array($json) && (!array_key_exists("excluido",$json))) {
-                    foreach($json as $key=>$entry) {
-                        if ($json[$key]['excluido'] == '0') {
-                            $json[$key]['excluido'] = false;
-                        } else {
-                            $json[$key]['excluido'] = true;
-                        }
-                    }
-                } else {
-                    if ($json['excluido'] == '0') {
-                        $json['excluido'] = false;
-                    } else {
-                        $json['excluido'] = true;
-                    }
-                }
-
-                header('Content-Type: application/json');
-                echo json_encode($json, JSON_UNESCAPED_UNICODE);
-                die();
-            }
-            */
-
-
         } if ($_SERVER["REQUEST_METHOD"] === "DELETE") {
 
-          header("HTTP/1.1 405");
-          die();
-
-          /*
           if (
-              !array_key_exists("uuid",$_GET)
+              !array_key_exists("uuid",$_GET) ||
+              !array_key_exists("quem-esta-acessando",$_GET)
           ) {
               header("HTTP/1.1 400");
               die();
           } else {
-              excluirItem($conexao,$_GET['uuid']);
+              $mensagem = $_GET["quem-esta-acessando"] . " excluiu este item.";
+              excluirItem($conexao,$_GET['uuid'],$mensagem);
 
               header("HTTP/1.1 200");
               die();
           }
-          */
 
         } else {
             header("HTTP/1.1 405");
