@@ -22,6 +22,7 @@
               array_key_exists("url_personagem",$entrada) &&
               array_key_exists("uuid_personagem",$entrada) &&
               array_key_exists("descricao",$entrada) &&
+              array_key_exists("detalhes",$entrada) &&
               array_key_exists("quantidade",$entrada) &&
               array_key_exists("peso_unitario",$entrada) &&
               array_key_exists("uuid_medida_peso_unitario",$entrada) &&
@@ -78,6 +79,7 @@
                 array_key_exists("url_personagem",$entrada) &&
                 array_key_exists("uuid_personagem",$entrada) &&
                 array_key_exists("descricao",$entrada) &&
+                array_key_exists("detalhes",$entrada) &&
                 array_key_exists("quantidade",$entrada) &&
                 array_key_exists("peso_unitario",$entrada) &&
                 array_key_exists("uuid_medida_peso_unitario",$entrada) &&

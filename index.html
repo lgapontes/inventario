@@ -219,9 +219,14 @@
         <div class="permissao" id="campanhas_editar_permissao">
 
           <!-- Permissão -->
-          <div class="bloco menor bloco-checkbox">
-            <input type="checkbox" id="campanhas_editar_controlar_peso" name="campanhas_editar_controlar_peso">
+          <div class="bloco menor bloco-checkbox" id="campanhas_editar_controlar_peso_div">
+            <input type="checkbox" id="campanhas_editar_controlar_peso" name="campanhas_editar_controlar_peso" disabled checked="checked">
             <label for="campanhas_editar_controlar_peso">Controlar peso dos itens</label>
+          </div>
+
+          <div class="bloco menor bloco-checkbox">
+            <input type="checkbox" id="campanhas_editar_permitir_alterar_quantidade_item" name="campanhas_editar_permitir_alterar_quantidade_item">
+            <label for="campanhas_editar_permitir_alterar_quantidade_item">Permitir alterar a quantidade do item</label>
           </div>
           <div class="bloco menor menor-direita bloco-checkbox">
             <input type="checkbox" id="campanhas_editar_permitir_incluir_item" name="campanhas_editar_permitir_incluir_item">
@@ -231,25 +236,24 @@
             <input type="checkbox" id="campanhas_editar_permitir_alterar_item" name="campanhas_editar_permitir_alterar_item">
             <label for="campanhas_editar_permitir_alterar_item">Permitir alterar item</label>
           </div>
+
           <div class="bloco menor menor-direita bloco-checkbox">
-            <input type="checkbox" id="campanhas_editar_permitir_alterar_quantidade_item" name="campanhas_editar_permitir_alterar_quantidade_item">
-            <label for="campanhas_editar_permitir_alterar_quantidade_item">Permitir alterar a quantidade do item</label>
-          </div>
-          <div class="bloco menor bloco-checkbox">
             <input type="checkbox" id="campanhas_editar_permitir_excluir_item" name="campanhas_editar_permitir_excluir_item">
             <label for="campanhas_editar_permitir_excluir_item">Permitir excluir item</label>
           </div>
-          <div class="bloco menor menor-direita bloco-checkbox">
+          <div class="bloco menor bloco-checkbox">
             <input type="checkbox" id="campanhas_editar_permitir_entregar_item" name="campanhas_editar_permitir_entregar_item">
             <label for="campanhas_editar_permitir_entregar_item">Permitir entregar item</label>
           </div>
-          <div class="bloco menor bloco-checkbox">
+          <div class="bloco menor menor-direita bloco-checkbox">
             <input type="checkbox" id="campanhas_editar_permitir_alterar_moedas" name="campanhas_editar_permitir_alterar_moedas">
             <label for="campanhas_editar_permitir_alterar_moedas">Permitir alterar moedas</label>
           </div>
-          <div class="bloco menor menor-direita bloco-checkbox">
+          <div class="bloco menor bloco-checkbox">
             <input type="checkbox" id="campanhas_editar_permitir_entregar_moedas" name="campanhas_editar_permitir_entregar_moedas">
             <label for="campanhas_editar_permitir_entregar_moedas">Permitir entregar moedas</label>
+          </div>
+          <div class="bloco menor menor-direita menor-vazio bloco-checkbox">
           </div>
 
           <div class="bloco">
@@ -404,6 +408,8 @@
         <input type="hidden" value="" id="personagens_editar_uuid_campanha">
         <input type="hidden" value="" id="personagens_editar_quem_esta_acessando">
         <input type="hidden" value="" id="personagens_editar_uuid_medida_padrao">
+        <input type="hidden" value="" id="personagens_editar_medida_sem_alterar">
+        <input type="hidden" value="" id="personagens_editar_peso_maximo_sem_alterar">
 
         <div class="bloco menor">
           <label for="personagens_editar_nome">Nome</label>
@@ -499,7 +505,11 @@
 
       <!-- Personagens Listar Itens -->
       <div class="titulo titulo-editar" id="itens_listar">
-        <h2>Itens do Personagem</h2>
+        <h2>Itens</h2>
+        <h3>|</h3>
+        <input type="text" value="" id="itens_listar_peso_atual">
+        <input type="text" class="margin" value="" id="itens_listar_peso_maximo">
+        <h3 class="margin" id="itens_listar_medida"></h3>
         <!--
         <button id="itens_listar_inserir">
           <img src="img/plus-solid.svg" />
@@ -623,5 +633,6 @@
     <script src="js/vanilla-toast.js"></script>
     <script type="text/javascript" src="js/script.js"></script>
     <script type="text/javascript" src="js/inventario.js"></script>
+    <script type="text/javascript" src="js\script-itens_FR.js"></script>
   </body>
 </html>

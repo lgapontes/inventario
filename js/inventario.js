@@ -246,6 +246,43 @@ function renderToast(msg) {
 }
 
 /******************************************************************************/
+/*****************************    CONVERSORES   *******************************/
+/******************************************************************************/
+
+function conversorUniversalParaGramas(medida,valor) {
+  let validado = validarNumeroComVirgula(valor);
+  if (validado.valido) {
+    if (medida === 'Litros') {
+      return (validado.valor * 1000);
+    } else if (medida === 'Quilos') {
+      return (validado.valor * 1000);
+    } else if (medida === 'Libras') {
+      return (validado.valor * 453.592);
+    } else if (medida === 'Mililitros') {
+      return validado.valor;
+    } else if (medida === 'Gramas') {
+      return validado.valor;
+    }
+  } else {
+    return 0;
+  }
+}
+
+function conversorUniversalDeGramasPara(medida,valor) {
+  if (medida === 'Litros') {
+    return (valor/1000).toFixed(1);
+  } else if (medida === 'Quilos') {
+    return (valor/1000).toFixed(1);
+  } else if (medida === 'Libras') {
+    return (valor/453.592).toFixed(1);
+  } else if (medida === 'Mililitros') {
+    return valor.toFixed(1);
+  } else if (medida === 'Gramas') {
+    return valor.toFixed(1);
+  }
+}
+
+/******************************************************************************/
 /******************************    VALIDAÇÃO   ********************************/
 /******************************************************************************/
 
@@ -257,6 +294,26 @@ function palavraEhProibida(text) {
     return true;
   }
   return false;
+}
+
+function capitalize(str) {
+  // Split string into an array of words
+  const string = str.toLowerCase().split(" ");
+  const cased = [];
+
+  let avoid = ['da','de','do','para','a','à','o','e','del','por','até','que','cujo','cuja','cujos','cujas','onde','mas','este','esta','isto','esse','essa','isso','aquele','aquela','aquilo','não','sim'];
+
+  // Convert every first letter to uppercase
+  string.map((word) => {
+    let changed = word;
+    if ( (!avoid.includes(changed)) && (changed.length > 2) ) {
+      changed = word[0].toUpperCase() + word.slice(1);
+    }
+    cased.push(changed);
+  });
+
+  // Convert my words array to a string with .join()
+  return cased.join(" ");
 }
 
 function validarCampanha(json) {
@@ -480,6 +537,12 @@ function validarItem(json,callback) {
   }
   if (palavraEhProibida(json.descricao)) {
     renderWarningToast('Há palavras proibidas no campo Item!');
+    callback(false);
+    return;
+  }
+
+  if (palavraEhProibida(json.detalhes)) {
+    renderWarningToast('Há palavras proibidas no campo Infos!');
     callback(false);
     return;
   }
@@ -1085,6 +1148,7 @@ function renderListaMoedas(json,callback) {
 
 function render_personagens_editar_campo(propriedade,valor,callback) {
   let ignorar_propriedades = ['eh_jogador','eh_narrador','eh_visualizador','sigla','uuid_medida_peso_maximo','url_campanha','permissoes','personagens_campanha','campanhas'];
+
   if (ignorar_propriedades.includes(propriedade)) {
     callback();
   } else {
@@ -1190,6 +1254,27 @@ function renderLinhaItem_label(bloco,id,classe,innerHTML) {
   bloco.appendChild(label);
 }
 
+function renderLinhaItem_textarea(bloco,value,id,disabled,classe) {
+  let textarea = document.createElement('textarea');
+
+  if (classe) {
+    textarea.classList.add(classe);
+  }
+
+  textarea.value = value;
+  textarea.id = id;
+  textarea.setAttribute('name',id);
+
+  if (disabled) {
+    textarea.setAttribute('disabled','disabled');
+    textarea.setAttribute('readonly','readonly');
+  }
+
+  bloco.appendChild(textarea);
+
+  return textarea;
+}
+
 function renderLinhaItem_input(bloco,type,value,id,disabled,min,classe) {
   let input = document.createElement('input');
   input.setAttribute('type',type);
@@ -1213,16 +1298,49 @@ function renderLinhaItem_input(bloco,type,value,id,disabled,min,classe) {
   }
 
   bloco.appendChild(input);
+
+  return input;
 }
 
 function obterQuemEstaAcessando() {
   return document.getElementById('personagens_editar_quem_esta_acessando').value;
 }
 
+function obterItensLista(callback) {
+  let tags = document.getElementById('itens_listar_lista');
+  let lista_tags = [...tags.querySelectorAll('div.bloco-item')];
+
+  if (lista_tags.length == 0) {
+    callback([]);
+  } else {
+    let lista = [];
+
+    lista_tags.forEach((tag, index) => {
+      let uuid = tag.querySelector('input[type=hidden]').value;
+      let tag_medida = document.getElementById(`medida_${uuid}`);
+      let medida = tag_medida.options[tag_medida.selectedIndex].innerHTML;
+      let peso_unitario = document.getElementById(`peso_${uuid}`).value;
+      let quantidade = document.getElementById(`quantidade_${uuid}`).value
+
+      lista.push({
+        uuid: uuid,
+        medida: medida,
+        peso_unitario: peso_unitario,
+        quantidade: quantidade,
+      });
+
+      if (index == (lista_tags.length - 1)) {
+        callback(lista);
+      }
+    });
+  }
+}
+
 function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_log) {
   /* IDs */
   let hidden_item_id = `id_${item.uuid}`;
   let input_item_id = `item_${item.uuid}`;
+  let input_detalhes_id = `detalhes_${item.uuid}`;
   let input_quantidade_id = `quantidade_${item.uuid}`;
   let bloco_log_id = `log_${item.uuid}`;
   let bloco_mensagem_id = `mensagem_${item.uuid}`;
@@ -1267,11 +1385,6 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
     'Item'
   );
 
-  let bloco_input_item_classe = null;
-  if (!editar) {
-    bloco_input_item_classe = 'inserir';
-  }
-
   renderLinhaItem_input(
     bloco_input_item,
     'text',
@@ -1279,9 +1392,8 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
     input_item_id,
     editar,
     null,
-    bloco_input_item_classe
+    'inserir'
   );
-  /* Descrição */
 
   if (editar) {
     // EDITAR
@@ -1300,6 +1412,7 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
       (event)=>{
         event.preventDefault();
         enableInput(input_item_id);
+        enableInput(input_detalhes_id);
         enableInput(input_quantidade_id);
         enableInput(input_peso_id);
         enableInput(select_medidas_clonado_id);
@@ -1323,6 +1436,7 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
         let url_personagem = document.getElementById('personagens_editar_url').value;
         let uuid_personagem = document.getElementById('personagens_editar_uuid').value;
         let descricao = document.getElementById(input_item_id).value;
+        let detalhes = document.getElementById(input_detalhes_id).value;
         let quantidade = document.getElementById(input_quantidade_id).value;
         let peso_unitario = document.getElementById(input_peso_id).value;
         let select = document.getElementById(select_medidas_clonado_id);
@@ -1330,13 +1444,14 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
         let uuid_medida_peso_unitario_texto = select.options[select.selectedIndex].innerHTML;
 
         /* Mensagem */
-        let mensagem = `${obterQuemEstaAcessando()} alterou os dados do item de (Descrição: ${item.descricao}, Qtde: ${item.quantidade}, Peso: ${item.peso_unitario} ${item.medida}) para (Descrição: ${descricao}, Qtde: ${quantidade}, Peso: ${peso_unitario} ${uuid_medida_peso_unitario_texto})`;
+        let mensagem = `${obterQuemEstaAcessando()} alterou os dados do item de (Descrição: ${item.descricao}, Infos: ${item.detalhes}, Qtde: ${item.quantidade}, Peso: ${item.peso_unitario} ${item.medida}) para (Descrição: ${descricao}, Infos: ${detalhes}, Qtde: ${quantidade}, Peso: ${peso_unitario} ${uuid_medida_peso_unitario_texto})`;
 
         let json_alterar = {
           uuid: uuid,
           url_personagem: url_personagem,
           uuid_personagem: uuid_personagem,
           descricao: descricao,
+          detalhes: detalhes,
           quantidade: quantidade,
           peso_unitario: peso_unitario,
           uuid_medida_peso_unitario: uuid_medida_peso_unitario,
@@ -1348,6 +1463,12 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
             // Item válido
 
             openJustLoading();
+
+            json_alterar.descricao = capitalize(json_alterar.descricao);
+            document.getElementById(input_item_id).value = json_alterar.descricao;
+            json_alterar.detalhes = capitalize(json_alterar.detalhes);
+            document.getElementById(input_detalhes_id).value = json_alterar.detalhes;
+
             alterar(
               createURL('itens.php'),
               json_alterar,
@@ -1355,14 +1476,19 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
                 document.getElementById(bloco_mensagem_id).innerHTML = json_retorno.mensagem;
                 document.getElementById(bloco_log_id).style.display = 'block';
                 disableInput(input_item_id);
+                disableInput(input_detalhes_id);
                 disableInput(input_quantidade_id);
                 disableInput(input_peso_id);
                 disableInput(select_medidas_clonado_id);
                 esconder_elemento(button_salvar_id);
                 mostrar_elemento(button_editar_id);
 
-                closeLoading();
-                renderToast('Item atualizado com sucesso!');
+                obterItensLista((lista_itens_tags)=>{
+                  renderTituloPesoMaximo(lista_itens_tags,()=>{
+                    closeLoading();
+                    renderToast('Item atualizado com sucesso!');
+                  });
+                });
               },
               (erro)=>{
                 console.error(erro);
@@ -1394,6 +1520,7 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
         event.preventDefault();
 
         let descricao = document.getElementById(input_item_id).value;
+        let detalhes = document.getElementById(input_detalhes_id).value;
         let quantidade = document.getElementById(input_quantidade_id).value;
         let peso_unitario = document.getElementById(input_peso_id).value;
         let select = document.getElementById(select_medidas_clonado_id);
@@ -1401,9 +1528,10 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
         let uuid_medida_peso_unitario_texto = select.options[select.selectedIndex].innerHTML;
 
         /* Mensagem */
-        let mensagem = `${obterQuemEstaAcessando()} inseriu o item (Descrição: ${descricao}, Qtde: ${quantidade}, Peso: ${peso_unitario} ${uuid_medida_peso_unitario_texto})`;
+        let mensagem = `${obterQuemEstaAcessando()} inseriu o item (Descrição: ${descricao}, Infos: ${detalhes}, Qtde: ${quantidade}, Peso: ${peso_unitario} ${uuid_medida_peso_unitario_texto})`;
 
         item.descricao = descricao;
+        item.detalhes = detalhes;
         item.quantidade = quantidade;
         item.peso_unitario = peso_unitario;
         item.uuid_medida_peso_unitario = uuid_medida_peso_unitario;
@@ -1414,6 +1542,12 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
             // Item válido
 
             openJustLoading();
+
+            item.descricao = capitalize(item.descricao);
+            document.getElementById(input_item_id).value = item.descricao;
+            item.detalhes = capitalize(item.detalhes);
+            document.getElementById(input_detalhes_id).value = item.detalhes;
+
             inserir(
               createURL('itens.php'),
               item,
@@ -1437,8 +1571,10 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
                       lista.appendChild(linha);
 
                       if (index === (json_lista_itens.itens.length - 1)) {
-                        closeLoading();
-                        renderToast('Item inserido com sucesso!');
+                        renderTituloPesoMaximo(json_lista_itens.itens,()=>{
+                          closeLoading();
+                          renderToast('Item inserido com sucesso!');
+                        });
                       }
                     });
                     // Lista de itens
@@ -1468,6 +1604,60 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
   } // INSERIR
 
   linha.appendChild(bloco_input_item);
+  /* Descrição */
+
+  /* Detalhes */
+  let bloco_input_detalhes = document.createElement('div');
+  bloco_input_detalhes.classList.add('bloco');
+  bloco_input_detalhes.classList.add('item');
+  bloco_input_detalhes.classList.add('borda');
+
+  renderLinhaItem_label(
+    bloco_input_detalhes,
+    input_detalhes_id,
+    null,
+    'Infos'
+  );
+
+  renderLinhaItem_input(
+    bloco_input_detalhes,
+    'text',
+    item.detalhes,
+    input_detalhes_id,
+    editar,
+    null,
+    'inserir'
+  );
+
+  linha.appendChild(bloco_input_detalhes);
+
+  if (editar) {
+    // EDITAR
+
+    /* Botão Log */
+    renderLinhaItem_botao(
+      button_log_id,
+      bloco_input_detalhes,
+      'azul',
+      'img/file-lines-solid.svg',
+      'Log',
+      false,
+      false,
+      (event)=>{
+        event.preventDefault();
+        let div_log = document.getElementById(bloco_log_id);
+        if (div_log.style.display === 'none') {
+          div_log.style.display = 'block';
+        } else {
+          div_log.style.display = 'none';
+        }
+      }
+    );
+
+    // EDITAR
+  }
+
+  /* Detalhes */
 
   let bloco_outros = document.createElement('div');
   bloco_outros.classList.add('bloco');
@@ -1536,8 +1726,12 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
                 document.getElementById(bloco_log_id).style.display = 'block';
                 input_quantidade.value = quantidade;
 
-                closeLoading();
-                renderToast('Quantidade do item atualizada!');
+                obterItensLista((lista_itens_tags)=>{
+                  renderTituloPesoMaximo(lista_itens_tags,()=>{
+                    closeLoading();
+                    renderToast('Quantidade do item atualizada!');
+                  });
+                });
               },
               (erro)=>{
                 console.error(erro);
@@ -1564,7 +1758,7 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
     'Peso'
   );
 
-  renderLinhaItem_input(
+  let input_peso_unitario = renderLinhaItem_input(
     bloco_outros,
     'text',
     item.peso_unitario,
@@ -1573,6 +1767,7 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
     null,
     'like-number'
   );
+  input_peso_unitario.addEventListener('keyup', template_com_virgula);
 
   let select_medidas_clonado = select_medidas.cloneNode(true);
   select_medidas_clonado.id = select_medidas_clonado_id;
@@ -1594,7 +1789,7 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
     renderLinhaItem_botao(
       button_excluir_id,
       bloco_outros,
-      null,
+      'excluir',
       'img/trash-solid.svg',
       'Excluir',
       false,
@@ -1606,26 +1801,6 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
         let quem_esta_acessando = obterQuemEstaAcessando();
         document.getElementById('modal_item_quem_esta_acessando').value = quem_esta_acessando;
         mostrar_elemento('modal_item');
-      }
-    );
-
-    /* Botão Log */
-    renderLinhaItem_botao(
-      button_log_id,
-      bloco_outros,
-      'espaco',
-      'img/file-lines-solid.svg',
-      'Log',
-      false,
-      false,
-      (event)=>{
-        event.preventDefault();
-        let div_log = document.getElementById(bloco_log_id);
-        if (div_log.style.display === 'none') {
-          div_log.style.display = 'block';
-        } else {
-          div_log.style.display = 'none';
-        }
       }
     );
 
@@ -1699,6 +1874,54 @@ function renderMedidasSelect(medidas,callback) {
   });
 }
 
+function renderControlePesoAtual(medida,peso_maximo,peso_atual) {
+  let peso_maximo_em_gramas = conversorUniversalParaGramas(medida,peso_maximo);
+  if (peso_maximo_em_gramas > 0) {
+    peso_maximo = peso_maximo_em_gramas;
+  } else {
+    peso_maximo = 0;
+  }
+
+  let tag_peso_atual = document.getElementById('itens_listar_peso_atual');
+  if (peso_atual <= peso_maximo) {
+    tag_peso_atual.style.backgroundColor = '#c8e6c9';
+    tag_peso_atual.style.color = '#388e3c';
+  } else {
+    tag_peso_atual.style.backgroundColor = '#ffab91';
+    tag_peso_atual.style.color = '#bf360c';
+  }
+
+  tag_peso_atual.value = conversorUniversalDeGramasPara(medida,peso_atual).replace('.', ',');
+}
+
+function renderControlePesoMaximo(medida,peso_maximo) {
+  document.getElementById('itens_listar_peso_maximo').value = parseFloat(peso_maximo).toFixed(1).replace('.', ',');
+  document.getElementById('itens_listar_medida').innerHTML = medida;
+}
+
+function renderTituloPesoMaximo(itens,callback) {
+  let medida = document.getElementById('personagens_editar_medida_sem_alterar').value;
+  let peso_maximo = document.getElementById('personagens_editar_peso_maximo_sem_alterar').value;
+
+  renderControlePesoMaximo(medida,peso_maximo);
+  let peso_atual_em_gramas = 0;
+
+  if (itens.length == 0) {
+    renderControlePesoAtual(medida,peso_maximo,peso_atual_em_gramas);
+    callback();
+  } else {
+    itens.forEach((item, index) => {
+      let peso_unitario = conversorUniversalParaGramas(item.medida,item.peso_unitario);
+      peso_atual_em_gramas += (peso_unitario * item.quantidade);
+
+      if (index == (itens.length - 1)) {
+        renderControlePesoAtual(medida,peso_maximo,peso_atual_em_gramas);
+        callback();
+      }
+    });
+  }
+}
+
 function listarItens(personagem,callback) {
   let lista = document.getElementById('itens_listar_lista');
   lista.innerHTML = '';
@@ -1720,22 +1943,24 @@ function listarItens(personagem,callback) {
           ...personagem.permissoes
         };
 
-        if (json.itens.length == 0) {
-          render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
-          let div = renderLinhaVaziaItens('Personagem sem itens');
-          lista.appendChild(div);
-          callback();
-        } else {
-          json.itens.forEach((item, index) => {
-            let linha = renderLinhaItem(permissoes,json.medidas,select_medidas,item,true,false);
-            lista.appendChild(linha);
+        renderTituloPesoMaximo(json.itens,()=>{
+          if (json.itens.length == 0) {
+            render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
+            let div = renderLinhaVaziaItens('Personagem sem itens');
+            lista.appendChild(div);
+            callback();
+          } else {
+            json.itens.forEach((item, index) => {
+              let linha = renderLinhaItem(permissoes,json.medidas,select_medidas,item,true,false);
+              lista.appendChild(linha);
 
-            if (index === (json.itens.length - 1)) {
-              render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
-              callback();
-            }
-          });
-        }
+              if (index === (json.itens.length - 1)) {
+                render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
+                callback();
+              }
+            });
+          }
+        });
       });
     },
     (erro)=>{
@@ -1772,6 +1997,7 @@ function render_botao_itens_listar_inserir(json,permissoes,medidas,select_medida
       let novo_item = {
         uuid: generateUUID(),
         descricao: '',
+        detalhes: '',
         quantidade: 1,
         peso_unitario: '0',
         uuid_medida_peso_unitario: json.uuid_medida_padrao,
@@ -1821,6 +2047,10 @@ function render_personagens_editar(json,callback) {
               (entry)=>`${entry.campanha}`,
               '',
               ()=>{
+                /* Para usar no cálculo do peso máximo e peso atual */
+                document.getElementById('personagens_editar_medida_sem_alterar').value = json.medida;
+                document.getElementById('personagens_editar_peso_maximo_sem_alterar').value = json.peso_maximo;
+
                 // Combo campanhas preenchido
                 let propriedades = Object.keys(json);
                 propriedades.forEach((propriedade, index) => {
@@ -1916,6 +2146,10 @@ function campanhas_editar_salvar(event) {
 
   if (validarCampanha(json)) {
     openLoading();
+
+    json.nome = capitalize(json.nome);
+    json.narrador = capitalize(json.narrador);
+
     alterar(
       createURL('campanhas.php'),
       json,
@@ -1988,6 +2222,10 @@ function campanhas_nova_salvar_listener(event) {
 
   if (validarCampanha(json)) {
     openLoading();
+
+    json.nome = capitalize(json.nome);
+    json.narrador = capitalize(json.narrador);
+
     inserir(
       createURL('campanhas.php'),
       json,
@@ -2052,6 +2290,10 @@ function personagens_novo_salvar_listener(event) {
   validarPersonagem(json,true,(valido)=>{
     if (valido) {
       openLoading();
+
+      json.nome = capitalize(json.nome);
+      json.jogador = capitalize(json.jogador);
+
       inserir(
         createURL('personagens.php'),
         json,
@@ -2119,6 +2361,10 @@ function personagens_editar_salvar(event) {
 
     validarPersonagem(json,false,(valido)=>{
       if (valido) {
+        openLoading();
+
+        json.nome = capitalize(json.nome);
+        json.jogador = capitalize(json.jogador);
 
         json['eh_narrador'] = false;
         json['eh_jogador'] = false;
@@ -2136,7 +2382,6 @@ function personagens_editar_salvar(event) {
           json['eh_visualizador'] = false;
         }
 
-        openLoading();
         alterar(
           createURL('personagens.php'),
           json,
@@ -2333,8 +2578,12 @@ function modal_item_excluir(event) {
         document.getElementById('modal_item_quem_esta_acessando').value = '';
         esconder_elemento('modal_item');
 
-        closeLoading();
-        renderToast('Item excluído com sucesso!');
+        obterItensLista((lista_itens_tags)=>{
+          renderTituloPesoMaximo(lista_itens_tags,()=>{
+            closeLoading();
+            renderToast('Item excluído com sucesso!');
+          });
+        });
       },
       (erro)=>{
         closeLoading();

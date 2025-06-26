@@ -11,7 +11,8 @@ CREATE TABLE `sistemas` (
 insert into sistemas (uuid,nome) values ('a66888e0-5259-424f-be09-c641b0040bc9','Advanced Dungeon & Dragons 2ed');
 
 -- 59327a5d-ac29-4e90-b2f2-c95fb5e0251e
-insert into sistemas (uuid,nome) values ('59327a5d-ac29-4e90-b2f2-c95fb5e0251e','Flechas & Magias');
+-- insert into sistemas (uuid,nome) values ('59327a5d-ac29-4e90-b2f2-c95fb5e0251e','Flechas & Magias');
+-- update sistemas set data_exclusao = now() where uuid = '59327a5d-ac29-4e90-b2f2-c95fb5e0251e';
 
 alter table itens_base add column `uuid_sistema` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT null;
 
@@ -30,3 +31,8 @@ CREATE TABLE `itens_alteracoes` (
   `alteracao` varchar(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+alter table itens add column `detalhes` varchar(10000) CHARACTER SET utf8mb4 NULL AFTER descricao;
+
+alter table itens_base add column `detalhes` varchar(10000) CHARACTER SET utf8mb4 NULL AFTER descricao;

@@ -1017,6 +1017,25 @@ div.inventario div.linha div.bloco > input[type=number] {
   background-color: rgba(59, 39, 11, .1);
 }
 
+div.inventario div.linha div.bloco > textarea {
+  display: block;
+  float: left;
+  width: 80%;
+  line-height: 22px;
+  padding: 4px 3px;
+  box-sizing: border-box;
+
+  font-family: "Oregon-LDO", sans-serif;
+  color: #423c2b;
+
+  font-size: 1.1em;
+  background-color: rgba(59, 39, 11, .1);
+
+  overflow-x: hidden;
+  overflow-y: scroll;
+  resize: none;
+}
+
 div.inventario div.linha div.bloco > input[type=text].menor,
 div.inventario div.linha div.bloco > input[type=number].menor {
   width: 70%;
@@ -1034,6 +1053,7 @@ div.inventario div.linha div.bloco > input[type=number].enviar {
   text-indent: 0;
 }
 
+div.inventario div.linha div.bloco > textarea[disabled],
 div.inventario div.linha div.bloco > input[disabled] {
   background-color: #cccccc;
   color: #666666;
@@ -1149,7 +1169,7 @@ div.inventario div.linha div.bloco-item > div.bloco {
 
 div.inventario div.linha div.bloco-item > div.borda {
   /* border-bottom: 1px solid rgba(59, 39, 11, .7); */
-  margin-bottom: 3px;
+  margin-bottom: 0;
 }
 
 div.inventario div.linha div.bloco-item > div.bloco > label {
@@ -1161,7 +1181,7 @@ div.inventario div.linha div.bloco-item > div.bloco > label.small-caps {
 }
 
 div.inventario div.linha div.bloco-item > div.bloco > label.espaco {
-  margin-left: 1%;
+  margin-left: 5%;
 }
 
 div.inventario div.linha div.bloco-item > div.bloco > label.log {
@@ -1169,8 +1189,8 @@ div.inventario div.linha div.bloco-item > div.bloco > label.log {
   font-style: italic;
   background-color: rgba(0,0,0,0);
   line-height: 20px;
-  margin-top: 5px;
-  margin-bottom: 3px;
+  padding: 5px 4px 3px 4px;
+  border-top: 1px solid rgba(59, 39, 11, .7);
 }
 
 div.inventario div.linha div.bloco-item > div.bloco > select {
@@ -1180,9 +1200,11 @@ div.inventario div.linha div.bloco-item > div.bloco > select {
   text-indent: 0;
 }
 
+div.inventario div.linha div.bloco-item > div.bloco > textarea,
 div.inventario div.linha div.bloco-item > div.bloco > input[type=text] {
   width: 78%;
   border-right: 1px solid rgba(59, 39, 11, .7);
+  border-bottom: 1px solid rgba(59, 39, 11, .7);
 }
 
 div.inventario div.linha div.bloco-item > div.bloco > input[type=number] {
@@ -1195,6 +1217,7 @@ div.inventario div.linha div.bloco-item > div.bloco > input[type=number] {
 div.inventario div.linha div.bloco-item > div.bloco > input[type=text].like-number {
   width: 13%;
   border-right: 1px solid rgba(59, 39, 11, .7);
+  border-bottom: 0;
   text-align: center;
   text-indent: 0;
 }
@@ -1219,8 +1242,22 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].inseri
   margin-left: 15px;
 }
 
-div.inventario div.linha div.bloco-item > div.bloco > button[type=button].espaco {
-  margin-right: 0.5%;
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button].verde > span {
+  float: left;
+  margin-left: 15px;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button].azul > span {
+  float: left;
+  margin-left: 17px;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button].excluir > span {
+  float: left;
+  margin-left: 15px;
+}
+
+div.inventario div.linha div.bloco-item > div.bloco > button[type=button].azul {
   background-color: #039be5;
 }
 
@@ -1238,8 +1275,8 @@ div.inventario div.linha div.bloco-item > div.bloco > button.inserir:hover {
   background-color: #81c784;
 }
 
-div.inventario div.linha div.bloco-item > div.bloco > button.espaco:focus,
-div.inventario div.linha div.bloco-item > div.bloco > button.espaco:hover {
+div.inventario div.linha div.bloco-item > div.bloco > button.azul:focus,
+div.inventario div.linha div.bloco-item > div.bloco > button.azul:hover {
   background-color: #03a9f4;
 }
 
@@ -1270,7 +1307,67 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancel
   background-color: #ef764c;
 }
 
+div.inventario > div.titulo > h3 {
+  display: block;
+  float: left;
+  font-size: 1.2em;
+  line-height: 30px;
+  padding-top: .5px;
+  color: #f9e3bb;
+  margin-left: 10px;
+}
+
+div.inventario > div.titulo > h3.margin {
+  margin-left: 4px;
+}
+
+div.inventario div.titulo-editar > input[type=text] {
+  display: block;
+  float: left;
+  font-weight: bold;
+  width: 55px;
+  line-height: 22px;
+  box-sizing: border-box;
+  padding-top: 4px;
+  font-family: "Oregon-LDO", sans-serif;
+  font-size: .9em;
+  border: 0;
+  background-color: #cccccc;
+  color: #666666;
+  margin: 1px 0 0 10px;
+  text-align: center;
+
+  /*
+  background-color: #c8e6c9;
+  color: #388e3c;
+
+  background-color: #ffab91;
+  color: #bf360c;
+  */
+}
+
+div.inventario div.titulo-editar > input[type=text].margin {
+  background-color: #ffffff;
+  color: #000000;
+  width: 60px;
+  border: 0;
+  border-left: 3px solid #000000;
+  margin-left: 0;
+}
+
+/*
+  Vermelho:
+  color: #bf360c;
+
+  Verde:
+  color: #43a047;
+*/
+
 /* Inventário - render */
+
+#campanhas_editar_controlar_peso_div {
+  display: none;
+}
 
 #campanhas_titulo {
   display: none;
@@ -1398,6 +1495,7 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancel
 
 #personagens_excluir_form {
   display: none;
+  margin-bottom: 300px;
 }
 
 #itens_listar {
@@ -1466,6 +1564,10 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancel
     margin-left: 2%;
   }
 
+  div.inventario div.linha div.menor-vazio {
+    background-color: rgba(0,0,0,0);
+  }
+
   div.inventario div.linha div.bloco > label {
     width: 10%;
   }
@@ -1494,6 +1596,7 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancel
     width: 90%;
   }
 
+  div.inventario div.linha div.bloco > textarea,
   div.inventario div.linha div.bloco > input[type=text],
   div.inventario div.linha div.bloco > input[type=number] {
     width: 90%;
@@ -1508,11 +1611,13 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancel
   }
 
   div.inventario div.linha div.menor > input[type=text],
+  div.inventario div.linha div.menor > textarea,
   div.inventario div.linha div.menor > input[type=number] {
     width: 80%;
   }
 
   div.inventario div.linha div.bloco > input[type=text].menor,
+  div.inventario div.linha div.bloco > textarea,
   div.inventario div.linha div.bloco > input[type=number].menor {
     width: 70%;
   }
@@ -1541,6 +1646,7 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancel
     width: 15%;
   }
 
+  div.inventario div.linha div.bloco-item > div.bloco > textarea.inserir,
   div.inventario div.linha div.bloco-item > div.bloco > input[type=text].inserir {
     width: 75%;
   }
@@ -1551,11 +1657,23 @@ div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancel
     width: auto;
   }
 
+  div.inventario div.linha div.bloco-item > div.bloco > button[type=button].azul {
+    width: 94px;
+  }
+
+  div.inventario div.linha div.bloco-item > div.bloco > button[type=button].verde {
+    width: 94px;
+  }
+
   div.inventario div.linha div.bloco-item > div.bloco > button[type=button].inserir {
     width: 94px;
   }
 
   div.inventario div.linha div.bloco-item > div.bloco > button[type=button].cancelar {
+    width: 94px;
+  }
+
+  div.inventario div.linha div.bloco-item > div.bloco > button[type=button].excluir {
     width: 94px;
   }
 

@@ -1073,27 +1073,6 @@
 
     /* Itens */
 
-    /*
-    function inserirItem($conexao,$registro) {
-        $registro["uuid"] = guidv4();
-
-        $query = 'insert into itens (uuid, uuid_personagem, descricao, quantidade, peso_unitario, uuid_medida_peso_unitario, data_cadastro, data_alteracao, data_exclusao) VALUES (?, ?, ?, ?, ?, ?, (SELECT CURRENT_TIMESTAMP()), (SELECT CURRENT_TIMESTAMP()), null)';
-
-        $resultado = $conexao->execute_query($query,[
-            $registro['uuid'],
-            $registro['uuid_personagem'],
-            $registro['descricao'],
-            $registro['quantidade'],
-            $registro['peso_unitario'],
-            $registro['uuid_medida_peso_unitario']
-        ]);
-
-        if (!$resultado) {
-            throw new Exception("Erro no banco de dados: " . $conexao->error);
-        }
-    }
-    */
-
     function inserirItem($conexao,$registro) {
         if ($registro['quantidade'] < 1) {
             $registro['quantidade'] = 0;
@@ -1104,11 +1083,13 @@
             uuid,
             uuid_personagem,
             descricao,
+            detalhes,
             quantidade,
             peso_unitario,
             uuid_medida_peso_unitario,
             data_cadastro
           ) VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -1123,6 +1104,7 @@
             $registro['uuid'],
             $registro['uuid_personagem'],
             $registro['descricao'],
+            $registro['detalhes'],
             $registro['quantidade'],
             $registro['peso_unitario'],
             $registro['uuid_medida_peso_unitario']
@@ -1264,6 +1246,7 @@
         $query = <<<QUERY
           update itens set
             descricao=?,
+            detalhes=?,
             quantidade=?,
             peso_unitario=?,
             uuid_medida_peso_unitario=?
@@ -1272,6 +1255,7 @@
 
         $resultado = $conexao->execute_query($query,[
             $registro['descricao'],
+            $registro['detalhes'],
             $registro['quantidade'],
             $registro['peso_unitario'],
             $registro['uuid_medida_peso_unitario'],
@@ -1306,6 +1290,7 @@
             itens.uuid,
             itens.uuid_personagem,
             itens.descricao,
+            IFNULL(itens.detalhes, '') as detalhes,
             itens.quantidade,
             itens.peso_unitario,
             itens.uuid_medida_peso_unitario,
@@ -1364,6 +1349,7 @@
         return $registros;
     }
 
+    /*
     function obterItens($conexao) {
         $registros = array();
 
@@ -1414,6 +1400,7 @@
 
         return $registros;
     }
+    */
 
     function excluirItem($conexao,$uuid,$mensagem) {
         $query = 'update itens set data_exclusao=(SELECT CURRENT_TIMESTAMP()) where uuid = ?';
@@ -1437,35 +1424,3 @@
             throw new Exception("Erro no banco de dados: " . $conexao->error);
         }
     }
-
-
-    /*
-
-    $conexao = conectar();
-    $registro = array();
-    $registro["uuid_personagem"] = '7138da3b-b91c-4ab8-98c6-95ffdf19bb3b';
-    $registro["descricao"] = 'Adaga';
-    $registro["quantidade"] = 1;
-    $registro["peso_unitario"] = '1';
-    $registro["uuid_medida_peso_unitario"] = '542fc103-6cbd-4ecc-b457-2959dd0ffe7f';
-    inserirItem($conexao,$registro);
-
-
-    $conexao = conectar();
-    $registro = array();
-    $registro["uuid"] = '3955cdaf-ff68-432a-be32-f99bca3fce76';
-    $registro["uuid_personagem"] = '7138da3b-b91c-4ab8-98c6-95ffdf19bb3b';
-    $registro["descricao"] = 'Adaga';
-    $registro["quantidade"] = 1;
-    $registro["peso_unitario"] = '1';
-    $registro["uuid_medida_peso_unitario"] = '542fc103-6cbd-4ecc-b457-2959dd0ffe7f';
-    alterarItem($conexao,$registro);
-
-
-    $conexao = conectar();
-    excluirItem($conexao,'3955cdaf-ff68-432a-be32-f99bca3fce76');
-
-    $conexao = conectar();
-    alterarQuantidadeItem($conexao,'3955cdaf-ff68-432a-be32-f99bca3fce76',0);
-
-    */
