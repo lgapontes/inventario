@@ -2,9 +2,9 @@
 /******************************      APOIO     ********************************/
 /******************************************************************************/
 
-const URL_REMOTA = 'https://www.flechamagica.com.br/aded2';
+const URL_REMOTA = 'https://www.flechamagica.com.br/inventario';
 const URL_LOCAL = 'http://localhost';
-const LOCALHOST = true;
+const LOCALHOST = false;
 const VARIAVEL_MENSAGEM = 'registro-mensagem';
 const BOTAO_VOLTAR = 'header-botao-voltar';
 
@@ -3142,7 +3142,7 @@ function render_item_autocomplete(campos_autocomplete,tag_input,itens_base,callb
     autocomplete_itens_detalhes[item_da_vez].uuid_medida_peso_unitario = entry.uuid_medida_peso_unitario;
     autocomplete_itens_detalhes[item_da_vez].uuid_sistema = entry.uuid_sistema;
 
-    if ((length - 1) == index) {      
+    if ((length - 1) == index) {
       autocomplete(tag_input, autocomplete_itens, autocomplete_itens_detalhes, campos_autocomplete);
       callback();
     }

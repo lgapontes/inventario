@@ -14,7 +14,7 @@
     }
 
     function conectar() {
-        $LOCAWEB = false;
+        $LOCAWEB = true;
 
         if ($LOCAWEB) {
           // Conexao remota
