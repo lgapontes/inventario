@@ -1147,7 +1147,7 @@ function renderListaMoedas(json,callback) {
 }
 
 function render_personagens_editar_campo(propriedade,valor,callback) {
-  let ignorar_propriedades = ['eh_jogador','eh_narrador','eh_visualizador','sigla','uuid_medida_peso_maximo','url_campanha','permissoes','personagens_campanha','campanhas'];
+  let ignorar_propriedades = ['eh_jogador','eh_narrador','eh_visualizador','sigla','uuid_medida_peso_maximo','url_campanha','permissoes','personagens_campanha','campanhas','uuid_sistema'];
 
   if (ignorar_propriedades.includes(propriedade)) {
     callback();
@@ -1336,7 +1336,7 @@ function obterItensLista(callback) {
   }
 }
 
-function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_log) {
+function renderLinhaItem(permissoes,itens_base,medidas,select_medidas,item,editar,exibir_log) {
   /* IDs */
   let hidden_item_id = `id_${item.uuid}`;
   let input_item_id = `item_${item.uuid}`;
@@ -1385,8 +1385,12 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
     'Item'
   );
 
-  renderLinhaItem_input(
-    bloco_input_item,
+  let bloco_input_item_autocomplete = document.createElement('div');
+  bloco_input_item_autocomplete.classList.add('autocomplete');
+  bloco_input_item_autocomplete.classList.add('autocomplete-size');
+
+  let input_item_autocomplete = renderLinhaItem_input(
+    bloco_input_item_autocomplete,
     'text',
     item.descricao,
     input_item_id,
@@ -1394,6 +1398,8 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
     null,
     'inserir'
   );
+
+  bloco_input_item.appendChild(bloco_input_item_autocomplete);
 
   if (editar) {
     // EDITAR
@@ -1567,7 +1573,7 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
                       if (entry.uuid === item.uuid) {
                         eh_para_exibir_log = true;
                       }
-                      let linha = renderLinhaItem(permissoes,medidas,select_medidas,entry,true,eh_para_exibir_log);
+                      let linha = renderLinhaItem(permissoes,itens_base,medidas,select_medidas,entry,true,eh_para_exibir_log);
                       lista.appendChild(linha);
 
                       if (index === (json_lista_itens.itens.length - 1)) {
@@ -1856,6 +1862,23 @@ function renderLinhaItem(permissoes,medidas,select_medidas,item,editar,exibir_lo
 
   } // EDITAR
 
+  if (!editar) { // INSERIR
+    let campos_autocomplete = {
+      descricao: input_item_id,
+      detalhes: input_detalhes_id,
+      quantidade: input_quantidade_id,
+      peso_unitario: input_peso_id,
+      uuid_medida_peso_unitario: select_medidas_clonado_id,
+    };
+
+    render_item_autocomplete(
+      campos_autocomplete,
+      input_item_autocomplete,
+      itens_base,
+      ()=>{}
+    );
+  } // INSERIR
+
   return linha;
 }
 
@@ -1922,6 +1945,22 @@ function renderTituloPesoMaximo(itens,callback) {
   }
 }
 
+function listarItensBase(uuid_sistema,callback) {
+  obter_com_parametro(
+    createURL('itens.php'),
+    'sistema',
+    uuid_sistema,
+    (json)=>{
+      callback(json);
+    },
+    (erro)=>{
+      console.error(erro);
+      renderErrorToast('Ocorreu um erro ao obter os dados!');
+      callback([]);
+    },
+  );
+}
+
 function listarItens(personagem,callback) {
   let lista = document.getElementById('itens_listar_lista');
   lista.innerHTML = '';
@@ -1944,22 +1983,32 @@ function listarItens(personagem,callback) {
         };
 
         renderTituloPesoMaximo(json.itens,()=>{
-          if (json.itens.length == 0) {
-            render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
-            let div = renderLinhaVaziaItens('Personagem sem itens');
-            lista.appendChild(div);
-            callback();
-          } else {
-            json.itens.forEach((item, index) => {
-              let linha = renderLinhaItem(permissoes,json.medidas,select_medidas,item,true,false);
-              lista.appendChild(linha);
+          // Título
 
-              if (index === (json.itens.length - 1)) {
-                render_botao_itens_listar_inserir(personagem,permissoes,json.medidas,select_medidas);
-                callback();
-              }
-            });
-          }
+          listarItensBase(personagem.uuid_sistema,(itens_base)=>{
+            // Itens Base
+
+            if (json.itens.length == 0) {
+              render_botao_itens_listar_inserir(personagem,permissoes,itens_base,json.medidas,select_medidas);
+              let div = renderLinhaVaziaItens('Personagem sem itens');
+              lista.appendChild(div);
+              callback();
+            } else {
+              json.itens.forEach((item, index) => {
+                let linha = renderLinhaItem(permissoes,itens_base,json.medidas,select_medidas,item,true,false);
+                lista.appendChild(linha);
+
+                if (index === (json.itens.length - 1)) {
+                  render_botao_itens_listar_inserir(personagem,permissoes,itens_base,json.medidas,select_medidas);
+                  callback();
+                }
+              });
+            }
+
+            // Itens Base
+          });
+
+          // Título
         });
       });
     },
@@ -1972,7 +2021,7 @@ function listarItens(personagem,callback) {
   /* Itens */
 }
 
-function render_botao_itens_listar_inserir(json,permissoes,medidas,select_medidas) {
+function render_botao_itens_listar_inserir(json,permissoes,itens_base,medidas,select_medidas) {
 
   let podeIncluirItem = (
     (permissoes.eh_narrador || permissoes.eh_jogador) &&
@@ -2013,7 +2062,7 @@ function render_botao_itens_listar_inserir(json,permissoes,medidas,select_medida
         lista.innerHTML = '';
       }
 
-      let linha = renderLinhaItem(permissoes,medidas,select_medidas,novo_item,false,false);
+      let linha = renderLinhaItem(permissoes,itens_base,medidas,select_medidas,novo_item,false,false);
       lista.insertBefore(linha, lista.firstChild);
     });
 
@@ -2908,6 +2957,198 @@ function editarPersonagens(pagina) {
     },
   );
 }
+
+/* AUTOCOMPLETE */
+function autocomplete_regra_comparacao(item,digitado) {
+  //return poco.substr(0, digitado.length).toUpperCase() == digitado.toUpperCase();
+  return item.toUpperCase().includes(digitado.toUpperCase());
+}
+
+function getIndicesOf(searchStr, str, caseSensitive) {
+    var searchStrLen = searchStr.length;
+    if (searchStrLen == 0) {
+        return [];
+    }
+    var startIndex = 0, index, indices = [];
+    if (!caseSensitive) {
+        str = str.toLowerCase();
+        searchStr = searchStr.toLowerCase();
+    }
+    while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+        indices.push(index);
+        startIndex = index + searchStrLen;
+    }
+    return indices;
+}
+
+function autocomplete_bold_text(item,digitado,callback) {
+
+  let inicio = 0;
+  let index = item.toLowerCase().indexOf(digitado.toLowerCase());
+  let retorno = '';
+
+  if (index > -1) {
+    inicio = index;
+
+    if (inicio == 0) {
+      retorno += "<strong>" + item.substr(0, digitado.length) + "</strong>" + item.substr(digitado.length);
+    } else {
+      retorno += item.substr(0, inicio);
+      retorno += "<strong>" + item.substr(inicio, digitado.length) + "</strong>";
+      retorno += item.substr(inicio + digitado.length);
+    }
+
+    callback(retorno);
+  } else {
+    callback(item);
+  }
+}
+
+function autocomplete(inp, arr, autocomplete_itens_detalhes, campos_autocomplete) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (autocomplete_regra_comparacao(arr[i],val)) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          // b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          // b.innerHTML += arr[i].substr(val.length);
+          autocomplete_bold_text(arr[i],val,(retorno)=>{
+
+            b.innerHTML = retorno;
+
+            /*insert a input field that will hold the current array item's value:*/
+            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+            /*execute a function when someone clicks on the item value (DIV element):*/
+            b.addEventListener("click", function(e) {
+                /*insert the value for the autocomplete text field:*/
+                inp.value = this.getElementsByTagName("input")[0].value;
+                /*close the list of autocompleted values,
+                (or any other open lists of autocompleted values:*/
+                closeAllLists();
+                selecionaItem(autocomplete_itens_detalhes,campos_autocomplete);
+            });
+            a.appendChild(b);
+
+          });
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        e.preventDefault();
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) x[currentFocus].click();
+        }
+      }
+  });
+
+  function selecionaItem(autocomplete_itens_detalhes,campos_autocomplete) {
+    if (inp.id === campos_autocomplete.descricao) {
+      let identifier = document.getElementById(campos_autocomplete.descricao).value;
+      if ((identifier != undefined) && (identifier != null) && (identifier in autocomplete_itens_detalhes)) {
+        document.getElementById(campos_autocomplete.detalhes).value = autocomplete_itens_detalhes[identifier].detalhes;
+        document.getElementById(campos_autocomplete.quantidade).value = 1;
+        document.getElementById(campos_autocomplete.peso_unitario).value = autocomplete_itens_detalhes[identifier].peso_unitario;
+        let select = document.getElementById(campos_autocomplete.uuid_medida_peso_unitario);
+        let index_select = [...select.options].findIndex(option => option.value === autocomplete_itens_detalhes[identifier].uuid_medida_peso_unitario);
+        if (index_select > -1) {
+          select.selectedIndex = index_select;
+        }
+      }
+    }
+  }
+
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  /*execute a function when someone clicks in the document:*/
+  document.addEventListener("click", function (e) {
+      closeAllLists(e.target);
+  });
+}
+
+function render_item_autocomplete(campos_autocomplete,tag_input,itens_base,callback) {
+  let length = itens_base.length;
+  tag_input.value = '';
+  autocomplete_itens = [];
+  autocomplete_itens_detalhes = {};
+
+  itens_base.forEach((entry,index) => {
+    let item_da_vez = entry.descricao;
+    autocomplete_itens.push(item_da_vez);
+    autocomplete_itens_detalhes[item_da_vez] = entry;
+    autocomplete_itens_detalhes[item_da_vez].id = entry.id;
+    autocomplete_itens_detalhes[item_da_vez].descricao = entry.descricao;
+    autocomplete_itens_detalhes[item_da_vez].detalhes = entry.detalhes;
+    autocomplete_itens_detalhes[item_da_vez].peso_unitario = entry.peso_unitario;
+    autocomplete_itens_detalhes[item_da_vez].uuid_medida_peso_unitario = entry.uuid_medida_peso_unitario;
+    autocomplete_itens_detalhes[item_da_vez].uuid_sistema = entry.uuid_sistema;
+
+    if ((length - 1) == index) {      
+      autocomplete(tag_input, autocomplete_itens, autocomplete_itens_detalhes, campos_autocomplete);
+      callback();
+    }
+  });
+}
+/* AUTOCOMPLETE */
 
 function iniciar() {
   console.log(`Versão ${VERSION}`);

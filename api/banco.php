@@ -905,6 +905,7 @@
             personagens.url_jogador,
             personagens.url_visualizador,
             campanhas.uuid_medida_padrao,
+            campanhas.uuid_sistema,
 
             CASE WHEN personagens.url_narrador = ?
             THEN true ELSE false END as eh_narrador,
@@ -1341,6 +1342,40 @@
                 $registro = converterBoolean($registro,'eh_narrador');
                 $registro = converterBoolean($registro,'eh_jogador');
                 $registro = converterBoolean($registro,'eh_visualizador');
+                $registro["peso_unitario"] = str_replace(".",",",$registro["peso_unitario"]);
+                array_push($registros,$registro);
+            }
+        }
+
+        return $registros;
+    }
+
+    function obterItensBase($conexao,$uuid_sistema) {
+        $registros = array();
+
+        $query = <<<QUERY
+          select
+            itens_base.id,
+            itens_base.descricao,
+            IFNULL(itens_base.detalhes, '') as detalhes,
+            itens_base.peso_unitario,
+            itens_base.uuid_medida_peso_unitario,
+            medidas.medida,
+            medidas.sigla
+          from itens_base
+          inner join medidas on medidas.uuid = itens_base.uuid_medida_peso_unitario
+          where
+            itens_base.uuid_sistema = ?
+          order by itens_base.descricao
+        QUERY;
+
+        $resultado = $conexao->execute_query($query,[$uuid_sistema]);
+        if (!$resultado) {
+            throw new Exception("Erro no banco de dados: " . $conexao->error);
+        }
+
+        if ($resultado->num_rows > 0) {
+            while($registro = $resultado->fetch_assoc()) {
                 $registro["peso_unitario"] = str_replace(".",",",$registro["peso_unitario"]);
                 array_push($registros,$registro);
             }

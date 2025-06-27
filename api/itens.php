@@ -179,6 +179,14 @@
                 header('Content-Type: application/json');
                 echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
                 die();
+            } else if (
+              array_key_exists('sistema',$_GET)
+            ) {
+              $itens_base = obterItensBase($conexao,$_GET['sistema']);
+
+              header('Content-Type: application/json');
+              echo json_encode($itens_base, JSON_UNESCAPED_UNICODE);
+              die();              
             } else {
               header("HTTP/1.1 400");
               die();

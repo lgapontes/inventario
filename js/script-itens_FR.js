@@ -648,4 +648,4 @@ function gerar_SQLs() {
   });
 }
 
-gerar_SQLs();
+// gerar_SQLs();
