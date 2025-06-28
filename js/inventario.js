@@ -298,7 +298,7 @@ function palavraEhProibida(text) {
 
 function capitalize(str) {
   // Split string into an array of words
-  const string = str.toLowerCase().split(" ");
+  const string = str.split(" ");
   const cased = [];
 
   let avoid = ['da','de','do','para','a','à','o','e','del','por','até','que','cujo','cuja','cujos','cujas','onde','mas','este','esta','isto','esse','essa','isso','aquele','aquela','aquilo','não','sim'];
@@ -813,7 +813,8 @@ function renderLinhaCampanha(nome,narrador,criacao,url,sistema) {
   linha.appendChild(renderBloco('Narrador','text',true,narrador,true,false));
   linha.appendChild(renderBloco('Criação','text',true,criacao,true,true));
   linha.addEventListener('click',(event)=>{
-    exibir_registro_via_url(event,url);
+    event.preventDefault();
+    exibir_registro_via_url(url);
   });
   return linha;
 }
@@ -939,6 +940,7 @@ function render_campanhas_editar_permissoes(json) {
     mostrar_elemento('campanhas_editar_salvar');
     enableInput('campanhas_editar_nome');
     enableInput('campanhas_editar_narrador');
+    enableInput('campanhas_editar_sistema');
     mostrar_elemento('campanhas_editar_permissao');
     mostrar_elemento('personagens_listar_inserir');
     mostrar_elemento('campanhas_excluir');
@@ -947,6 +949,7 @@ function render_campanhas_editar_permissoes(json) {
     esconder_elemento('campanhas_editar_salvar');
     disableInput('campanhas_editar_nome');
     disableInput('campanhas_editar_narrador');
+    disableInput('campanhas_editar_sistema');
     esconder_elemento('campanhas_editar_permissao');
     mostrar_elemento('personagens_listar_inserir');
     esconder_elemento('campanhas_excluir');
@@ -955,6 +958,7 @@ function render_campanhas_editar_permissoes(json) {
     esconder_elemento('campanhas_editar_salvar');
     disableInput('campanhas_editar_nome');
     disableInput('campanhas_editar_narrador');
+    disableInput('campanhas_editar_sistema');
     esconder_elemento('campanhas_editar_permissao');
     esconder_elemento('personagens_listar_inserir');
     esconder_elemento('campanhas_excluir');
@@ -969,7 +973,8 @@ function renderLinhaPersonagem(personagem) {
   linha.appendChild(renderBloco('Nome','text',true,personagem.nome,true,false));
   linha.appendChild(renderBloco('Jogador','text',true,personagem.jogador,true,true));
   linha.addEventListener('click',(event)=>{
-    exibir_registro_via_url(event,personagem.url);
+    event.preventDefault();
+    exibir_registro_via_url(personagem.url);
   });
   return linha;
 }
@@ -1086,10 +1091,19 @@ function render_campanhas_editar(json,callback) {
       let valor = json.campanha[propriedade];
       render_campanhas_editar_campo(propriedade,valor,()=>{
         if (index === (propriedades.length - 1)) {
-          listarPersonagens(()=>{
-            closeLoading();
-            callback();
-          });
+          preecherSelect(
+            'campanhas_editar_sistema',
+            json.sistemas,
+            'uuid',
+            (entry)=>`${entry.nome}`,
+            json.campanha.uuid_sistema,
+            ()=>{
+              listarPersonagens(()=>{
+                closeLoading();
+                callback();
+              });
+            }
+          );
         }
       });
     });
@@ -2132,8 +2146,7 @@ function render_personagens_editar(json,callback) {
 /******************************     EVENTOS     *******************************/
 /******************************************************************************/
 
-function exibir_registro_via_url(event,url) {
-  event.preventDefault();
+function exibir_registro_via_url(url) {
   adicionarValorAtualBotaoSalvar();
   let href = render_alterar_link_gerar_url(url);
   window.location.href = href;
@@ -2280,6 +2293,8 @@ function campanhas_nova_salvar_listener(event) {
       json,
       ()=>{
         /* Campanha SALVA, obter dados */
+        adicionarValorAtualBotaoSalvar();
+
         obter_com_parametro(
           createURL('campanhas.php'),
           'url',
@@ -2348,6 +2363,8 @@ function personagens_novo_salvar_listener(event) {
         json,
         ()=>{
           /* Personagem salvo com sucesso */
+          adicionarValorAtualBotaoSalvar();
+
           obter_com_parametro(
             createURL('personagens.php'),
             'url',

@@ -1057,6 +1057,7 @@ div.inventario div.linha div.bloco textarea[disabled],
 div.inventario div.linha div.bloco input[disabled] {
   background-color: #cccccc;
   color: #666666;
+  opacity: 1;
 }
 
 div.inventario div.linha div.bloco > select {
